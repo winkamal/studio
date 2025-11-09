@@ -11,9 +11,9 @@ function DynamicStyles() {
   const { data: settings } = useDoc<AboutContent>(settingsRef);
 
   const styles = `
-    :root {
+    html:not(.dark) {
       ${settings?.backgroundColor ? `--background: ${settings.backgroundColor};` : ''}
-      
+
       --gradient-color-1: ${settings?.gradientColor1 ? `hsl(${settings.gradientColor1})` : 'hsl(var(--primary) / 0.1)'};
       --gradient-color-2: ${settings?.gradientColor2 ? `hsl(${settings.gradientColor2})` : 'hsl(var(--accent) / 0.1)'};
       --gradient-color-3: ${settings?.gradientColor3 ? `hsl(${settings.gradientColor3})` : 'hsl(var(--background))'};
