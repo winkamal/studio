@@ -60,6 +60,20 @@
         "coverImage",
         "date"
       ]
+    },
+    "AboutContent": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "AboutContent",
+      "type": "object",
+      "description": "Stores the content for the About Me page.",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "imageUrl": { "type": "string" },
+        "bio": { "type": "string" },
+        "content": { "type": "string" }
+      },
+      "required": ["id", "name", "imageUrl", "bio", "content"]
     }
   },
   "auth": {
@@ -84,6 +98,16 @@
               "description": "Unique identifier for the blog post."
             }
           ]
+        }
+      },
+      {
+        "path": "/settings/about",
+        "definition": {
+            "entityName": "AboutContent",
+            "schema": {
+                "$ref": "#/entities/AboutContent"
+            },
+            "description": "Stores the content for the about page."
         }
       }
     ]

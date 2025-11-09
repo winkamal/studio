@@ -22,3 +22,11 @@ export type BlogPost = {
   content: string;
   tags: string[];
 }
+
+export type AboutContent = {
+    id: string;
+    name: string;
+    imageUrl: string;
+    bio: string;
+    content: string;
+};

@@ -179,8 +179,8 @@ export function SiteSidebar() {
       </SidebarContent>
       <SidebarFooter>
         <div className="flex items-center justify-between p-2">
-            <span className="text-xs text-muted-foreground">© 2024 VT blogs</span>
             <ThemeToggle />
+            <span className="text-xs text-muted-foreground">© 2024 VT blogs</span>
         </div>
       </SidebarFooter>
     </>
