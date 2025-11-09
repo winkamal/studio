@@ -4,7 +4,6 @@ import { SiteHeader } from "@/components/site-header";
 import { useCollection, useFirestore, useMemoFirebase } from "@/firebase";
 import { collection, query, orderBy } from "firebase/firestore";
 import type { BlogPost } from "@/types";
-import { useMemo } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardHeader, CardFooter } from "@/components/ui/card";
 import { Sidebar, SidebarInset, SidebarProvider, SidebarRail } from "@/components/ui/sidebar";
@@ -25,7 +24,7 @@ export default function Home() {
       <div className="relative flex flex-col">
         <SiteHeader />
         <div className="flex-1">
-          <Sidebar>
+          <Sidebar variant="sidebar">
             <SiteSidebar />
             <SidebarRail />
           </Sidebar>

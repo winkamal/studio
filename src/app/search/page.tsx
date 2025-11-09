@@ -213,7 +213,7 @@ function SearchPageInternal() {
       <div className="relative flex flex-col">
         <SiteHeader />
         <div className="flex-1">
-          <Sidebar>
+          <Sidebar variant="sidebar">
             <SiteSidebar />
             <SidebarRail />
           </Sidebar>
