@@ -1,3 +1,4 @@
+
 {
   "entities": {
     "BlogPost": {
@@ -76,7 +77,7 @@
         "githubUrl": { "type": "string" },
         "linkedinUrl": { "type": "string" },
         "backgroundColor": { "type": "string" },
-        "foregroundColor": { "type": "string" },
+        "blogFontColor": { "type": "string" },
         "gradientColor1": { "type": "string" },
         "gradientColor2": { "type": "string" },
         "gradientColor3": { "type": "string" },

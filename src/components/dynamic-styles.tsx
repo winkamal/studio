@@ -13,12 +13,14 @@ function DynamicStyles() {
   const styles = `
     :root {
       ${settings?.backgroundColor ? `--background: ${settings.backgroundColor};` : ''}
-      ${settings?.foregroundColor ? `--foreground: ${settings.foregroundColor};` : ''}
       
       --gradient-color-1: ${settings?.gradientColor1 ? `hsl(${settings.gradientColor1})` : 'hsl(var(--primary) / 0.1)'};
       --gradient-color-2: ${settings?.gradientColor2 ? `hsl(${settings.gradientColor2})` : 'hsl(var(--accent) / 0.1)'};
       --gradient-color-3: ${settings?.gradientColor3 ? `hsl(${settings.gradientColor3})` : 'hsl(var(--background))'};
       --gradient-color-4: ${settings?.gradientColor4 ? `hsl(${settings.gradientColor4})` : 'hsl(var(--muted))'};
+    }
+    .prose {
+        ${settings?.blogFontColor ? `color: hsl(${settings.blogFontColor});` : ''}
     }
   `;
 

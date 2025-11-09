@@ -34,7 +34,7 @@ export default function SiteSettingsPage() {
     const [linkedinUrl, setLinkedinUrl] = useState('');
 
     const [backgroundColor, setBackgroundColor] = useState('');
-    const [foregroundColor, setForegroundColor] = useState('');
+    const [blogFontColor, setBlogFontColor] = useState('');
     const [gradientColor1, setGradientColor1] = useState('');
     const [gradientColor2, setGradientColor2] = useState('');
     const [gradientColor3, setGradientColor3] = useState('');
@@ -55,7 +55,7 @@ export default function SiteSettingsPage() {
             setLinkedinUrl(aboutContent.linkedinUrl || '');
 
             setBackgroundColor(aboutContent.backgroundColor || '');
-            setForegroundColor(aboutContent.foregroundColor || '');
+            setBlogFontColor(aboutContent.blogFontColor || '');
             setGradientColor1(aboutContent.gradientColor1 || '');
             setGradientColor2(aboutContent.gradientColor2 || '');
             setGradientColor3(aboutContent.gradientColor3 || '');
@@ -88,7 +88,7 @@ export default function SiteSettingsPage() {
             githubUrl,
             linkedinUrl,
             backgroundColor,
-            foregroundColor,
+            blogFontColor,
             gradientColor1,
             gradientColor2,
             gradientColor3,
@@ -227,18 +227,18 @@ export default function SiteSettingsPage() {
                                     <p className="text-xs text-muted-foreground">Pick a color or enter HSL values (e.g., 240 10% 3.9%).</p>
                                 </div>
                                 <div className="space-y-2">
-                                    <Label htmlFor="foregroundColor">Foreground Color</Label>
+                                    <Label htmlFor="blogFontColor">Blog Font Color</Label>
                                      <div className="relative flex items-center">
                                         <Input
-                                          id="foregroundColor"
+                                          id="blogFontColor"
                                           type="color"
-                                          value={hslToHex(foregroundColor) || '#000000'}
+                                          value={hslToHex(blogFontColor) || '#000000'}
                                           className="absolute h-full w-12 p-1"
-                                          onChange={e => setForegroundColor(hexToHsl(e.target.value) || '')}
+                                          onChange={e => setBlogFontColor(hexToHsl(e.target.value) || '')}
                                         />
                                         <Input
-                                            value={foregroundColor}
-                                            onChange={e => setForegroundColor(e.target.value)}
+                                            value={blogFontColor}
+                                            onChange={e => setBlogFontColor(e.target.value)}
                                             placeholder="e.g., 240 10% 3.9%"
                                             className="pl-14"
                                         />
@@ -305,5 +305,3 @@ export default function SiteSettingsPage() {
     </div>
   );
 }
-
-    
