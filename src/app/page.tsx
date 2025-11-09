@@ -81,7 +81,25 @@ function BlogSelector({
   );
 }
 
-function PostViewer({ post }: { post: BlogPost | null }) {
+function PostViewer({ post, isLoading }: { post: BlogPost | null, isLoading: boolean }) {
+  if (isLoading) {
+    return (
+        <article>
+            <header className="mb-8">
+                <Skeleton className="h-64 md:h-80 w-full mb-8 rounded-2xl" />
+                <Skeleton className="h-10 w-3/4 mb-2" />
+                <Skeleton className="h-5 w-1/3" />
+            </header>
+            <div className="space-y-4">
+                <Skeleton className="h-5 w-full" />
+                <Skeleton className="h-5 w-full" />
+                <Skeleton className="h-5 w-5/6" />
+                <Skeleton className="h-5 w-full" />
+            </div>
+        </article>
+    )
+  }
+  
   if (!post) {
     return (
       <div className="flex h-full items-center justify-center">
@@ -191,7 +209,7 @@ export default function Home() {
                         <div className="md:col-span-2 lg:col-span-3">
                             <ScrollArea className="h-full">
                                 <div className="skew-card p-8 lg:p-12">
-                                    <PostViewer post={selectedPost} />
+                                    <PostViewer post={selectedPost} isLoading={isLoading && !posts} />
                                 </div>
                             </ScrollArea>
                         </div>
