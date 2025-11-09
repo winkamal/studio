@@ -16,6 +16,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
+import { hexToHsl, hslToHex } from "@/lib/utils";
 
 export default function SiteSettingsPage() {
     const firestore = useFirestore();
@@ -178,13 +179,41 @@ export default function SiteSettingsPage() {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div className="space-y-2">
                                     <Label htmlFor="backgroundColor">Background Color</Label>
-                                    <Input id="backgroundColor" value={backgroundColor} onChange={e => setBackgroundColor(e.target.value)} placeholder="e.g., 240 20% 98%"/>
-                                    <p className="text-xs text-muted-foreground">Enter HSL values (e.g., 240 10% 3.9%).</p>
+                                    <div className="relative flex items-center">
+                                        <Input
+                                          id="backgroundColor"
+                                          type="color"
+                                          value={hslToHex(backgroundColor) || '#FFFFFF'}
+                                          className="absolute h-full w-12 p-1"
+                                          onChange={e => setBackgroundColor(hexToHsl(e.target.value) || '')}
+                                        />
+                                        <Input
+                                            value={backgroundColor}
+                                            onChange={e => setBackgroundColor(e.target.value)}
+                                            placeholder="e.g., 240 20% 98%"
+                                            className="pl-14"
+                                        />
+                                    </div>
+                                    <p className="text-xs text-muted-foreground">Pick a color or enter HSL values (e.g., 240 10% 3.9%).</p>
                                 </div>
                                 <div className="space-y-2">
                                     <Label htmlFor="foregroundColor">Foreground Color</Label>
-                                    <Input id="foregroundColor" value={foregroundColor} onChange={e => setForegroundColor(e.target.value)} placeholder="e.g., 240 10% 3.9%"/>
-                                    <p className="text-xs text-muted-foreground">Enter HSL values (e.g., 240 10% 3.9%).</p>
+                                     <div className="relative flex items-center">
+                                        <Input
+                                          id="foregroundColor"
+                                          type="color"
+                                          value={hslToHex(foregroundColor) || '#000000'}
+                                          className="absolute h-full w-12 p-1"
+                                          onChange={e => setForegroundColor(hexToHsl(e.target.value) || '')}
+                                        />
+                                        <Input
+                                            value={foregroundColor}
+                                            onChange={e => setForegroundColor(e.target.value)}
+                                            placeholder="e.g., 240 10% 3.9%"
+                                            className="pl-14"
+                                        />
+                                    </div>
+                                    <p className="text-xs text-muted-foreground">Pick a color or enter HSL values (e.g., 240 10% 3.9%).</p>
                                 </div>
                             </div>
                             <div className="space-y-2">
