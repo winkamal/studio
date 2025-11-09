@@ -84,15 +84,17 @@ export default function AboutPage() {
       <div className="relative flex flex-col min-h-screen">
         <SiteHeader />
         <div className="flex-1 flex">
-          <Sidebar>
+          <Sidebar variant="sidebar">
             <SiteSidebar />
             <SidebarRail />
           </Sidebar>
-          <SidebarInset className="flex-1">
-            <main className="container mx-auto px-4 py-8 pt-12">
-              {isLoading || !aboutContent ? <AboutPageSkeleton /> : <AboutPageContent content={aboutContent} />}
-            </main>
-          </SidebarInset>
+          <div className="flex-1 flex flex-col">
+            <SidebarInset className="flex-1 pt-14">
+              <main className="container mx-auto px-4 py-8">
+                {isLoading || !aboutContent ? <AboutPageSkeleton /> : <AboutPageContent content={aboutContent} />}
+              </main>
+            </SidebarInset>
+          </div>
         </div>
       </div>
     </SidebarProvider>
