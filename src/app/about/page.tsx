@@ -89,7 +89,7 @@ export default function AboutPage() {
             <SidebarRail />
           </Sidebar>
           <SidebarInset className="flex-1">
-            <main className="container mx-auto px-4 py-8">
+            <main className="container mx-auto px-4 py-8 pt-12">
               {isLoading || !aboutContent ? <AboutPageSkeleton /> : <AboutPageContent content={aboutContent} />}
             </main>
           </SidebarInset>

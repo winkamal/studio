@@ -218,7 +218,7 @@ function SearchPageInternal() {
             <SidebarRail />
           </Sidebar>
           <SidebarInset className="flex-1">
-            <main className="container mx-auto px-4 py-8">
+            <main className="container mx-auto px-4 py-8 pt-12">
               <SearchResults />
             </main>
           </SidebarInset>

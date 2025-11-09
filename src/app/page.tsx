@@ -30,7 +30,7 @@ export default function Home() {
           </Sidebar>
           <SidebarInset className="flex-1">
             <HeroBanner />
-            <main className="container mx-auto px-4 py-8">
+            <main className="container mx-auto px-4 py-8 pt-12">
               {isLoading && !posts ? (
                 <div className="grid gap-12 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 justify-center">
                   {[...Array(3)].map((_, i) => (
