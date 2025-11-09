@@ -1,0 +1,71 @@
+import type { Post } from "@/types";
+import Image from "next/image";
+import Link from "next/link";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { format } from "date-fns";
+
+interface PostCardProps {
+  post: Post;
+}
+
+export function PostCard({ post }: PostCardProps) {
+  return (
+    <Card className="flex flex-col overflow-hidden transition-transform duration-300 ease-in-out hover:scale-[1.02] hover:shadow-lg">
+      <Link href={`/posts/${post.slug}`} className="block">
+        <CardHeader className="p-0">
+          <div className="relative h-48 w-full">
+            <Image
+              src={post.coverImage}
+              alt={post.title}
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              data-ai-hint={post.coverImageHint}
+            />
+          </div>
+        </CardHeader>
+      </Link>
+      <CardContent className="flex-grow p-6">
+        <div className="mb-4 flex flex-wrap gap-2">
+          {post.tags.map((tag) => (
+            <Link href={`/search?tag=${tag}`} key={tag}>
+                <Badge variant="secondary" className="transition-colors hover:bg-accent">{tag}</Badge>
+            </Link>
+          ))}
+        </div>
+        <Link href={`/posts/${post.slug}`} className="block">
+          <CardTitle className="font-headline text-2xl mb-2 hover:text-primary transition-colors">
+            {post.title}
+          </CardTitle>
+          <p className="text-muted-foreground">{post.excerpt}</p>
+        </Link>
+      </CardContent>
+      <CardFooter className="p-6 pt-0">
+        <div className="flex items-center gap-3">
+          <Avatar className="h-8 w-8">
+            <AvatarImage
+              src="https://picsum.photos/seed/author/40/40"
+              alt={post.author}
+              data-ai-hint="person portrait"
+            />
+            <AvatarFallback>{post.author.charAt(0)}</AvatarFallback>
+          </Avatar>
+          <div>
+            <p className="text-sm font-medium">{post.author}</p>
+            <p className="text-xs text-muted-foreground">
+              {format(new Date(post.date), "MMMM d, yyyy")}
+            </p>
+          </div>
+        </div>
+      </CardFooter>
+    </Card>
+  );
+}

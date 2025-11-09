@@ -1,3 +1,46 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "1",
+      "description": "A quiet morning with a cup of coffee.",
+      "imageUrl": "https://images.unsplash.com/photo-1604881988758-f76ad2f7aac1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8Y29mZmVlJTIwbW9ybmluZ3xlbnwwfHx8fDE3NjI2ODAzMDd8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "coffee morning"
+    },
+    {
+      "id": "2",
+      "description": "A walk through a sunlit park in autumn.",
+      "imageUrl": "https://images.unsplash.com/photo-1509224863479-ab583ee78692?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxhdXR1bW4lMjBwYXJrfGVufDB8fHx8MTc2MjY5MjQ5OXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "autumn park"
+    },
+    {
+      "id": "3",
+      "description": "An open book on a cozy blanket.",
+      "imageUrl": "https://images.unsplash.com/photo-1730050422872-01947cae4fba?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxib29rJTIwY296eXxlbnwwfHx8fDE3NjI2OTI0OTl8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "book cozy"
+    },
+    {
+      "id": "4",
+      "description": "City lights at dusk from a high viewpoint.",
+      "imageUrl": "https://images.unsplash.com/photo-1650191337060-45e5c3c35ac9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxjaXR5JTIwZHVza3xlbnwwfHx8fDE3NjI2MjM3MDZ8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "city dusk"
+    },
+    {
+      "id": "5",
+      "description": "A person writing in a journal.",
+      "imageUrl": "https://images.unsplash.com/photo-1509824189536-24ab5d1ecb00?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHx3cml0aW5nJTIwam91cm5hbHxlbnwwfHx8fDE3NjI2MTM4MTV8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "writing journal"
+    },
+    {
+      "id": "6",
+      "description": "A path leading into a misty forest.",
+      "imageUrl": "https://images.unsplash.com/photo-1418065460487-3e41a6c84dc5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxtaXN0eSUyMGZvcmVzdHxlbnwwfHx8fDE3NjI2NTU2ODh8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "misty forest"
+    },
+    {
+      "id": "about-me",
+      "description": "Portrait of a person smiling.",
+      "imageUrl": "https://images.unsplash.com/photo-1522529599102-193c0d76b5b6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxwZXJzb24lMjBzbWlsaW5nfGVufDB8fHx8MTc2MjY0MzE3N3ww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "person smiling"
+    }
+  ]
 }
