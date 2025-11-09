@@ -1,3 +1,4 @@
+
 "use client";
 import { notFound, useParams } from "next/navigation";
 import Image from "next/image";
@@ -12,7 +13,7 @@ import { collection, where, query } from "firebase/firestore";
 import { useCollection } from "@/firebase/firestore/use-collection";
 import type { BlogPost } from "@/types";
 import { Skeleton } from "@/components/ui/skeleton";
-import { SidebarProvider } from "@/components/ui/sidebar";
+import { SidebarProvider, Sidebar, SiteSidebar, SidebarRail, SidebarInset } from "@/components/ui/sidebar";
 
 
 export default function PostPage() {
@@ -22,12 +23,12 @@ export default function PostPage() {
   const firestore = useFirestore();
   
   const postsCollection = useMemoFirebase(
-    () => collection(firestore, 'blogs'), 
+    () => firestore ? collection(firestore, 'blogs') : null, 
     [firestore]
   );
   
   const postQuery = useMemoFirebase(
-    () => query(postsCollection, where("slug", "==", slug)),
+    () => postsCollection ? query(postsCollection, where("slug", "==", slug)) : null,
     [postsCollection, slug]
   );
 
@@ -39,24 +40,32 @@ export default function PostPage() {
         <SidebarProvider>
           <div className="relative flex min-h-screen flex-col">
               <SiteHeader />
-              <main className="container mx-auto px-4 py-8">
-                  <Skeleton className="h-96 w-full mb-8" />
-                  <div className="max-w-3xl mx-auto">
-                      <Skeleton className="h-12 w-3/4 mb-4" />
-                      <div className="flex items-center gap-4">
-                          <Skeleton className="h-12 w-12 rounded-full" />
-                          <div className="space-y-2">
-                              <Skeleton className="h-4 w-24" />
-                              <Skeleton className="h-4 w-32" />
-                          </div>
-                      </div>
-                      <div className="mt-8 space-y-4">
-                          <Skeleton className="h-6 w-full" />
-                          <Skeleton className="h-6 w-full" />
-                          <Skeleton className="h-6 w-5/6" />
-                      </div>
-                  </div>
-              </main>
+              <div className="flex-1">
+                <Sidebar>
+                  <SiteSidebar />
+                  <SidebarRail />
+                </Sidebar>
+                <SidebarInset>
+                    <main className="container mx-auto px-4 py-8">
+                        <Skeleton className="h-96 w-full mb-8" />
+                        <div className="max-w-3xl mx-auto">
+                            <Skeleton className="h-12 w-3/4 mb-4" />
+                            <div className="flex items-center gap-4">
+                                <Skeleton className="h-12 w-12 rounded-full" />
+                                <div className="space-y-2">
+                                    <Skeleton className="h-4 w-24" />
+                                    <Skeleton className="h-4 w-32" />
+                                </div>
+                            </div>
+                            <div className="mt-8 space-y-4">
+                                <Skeleton className="h-6 w-full" />
+                                <Skeleton className="h-6 w-full" />
+                                <Skeleton className="h-6 w-5/6" />
+                            </div>
+                        </div>
+                    </main>
+                </SidebarInset>
+              </div>
           </div>
         </SidebarProvider>
       )
@@ -70,55 +79,63 @@ export default function PostPage() {
     <SidebarProvider>
       <div className="relative flex min-h-screen flex-col">
         <SiteHeader />
-        <main className="py-8">
-          <article>
-            <header className="container mx-auto px-4 mb-8">
-              <div className="relative h-64 md:h-96 w-full mb-8 rounded-lg overflow-hidden shadow-lg">
-                <Image
-                  src={post.coverImage}
-                  alt={post.title}
-                  fill
-                  className="object-cover"
-                  priority
-                  data-ai-hint={post.coverImageHint}
-                />
-                <div className="absolute inset-0 bg-black/30" />
-              </div>
-
-              <div className="max-w-3xl mx-auto">
-                  <div className="mb-4 flex flex-wrap gap-2">
-                      {post.tags.map((tag) => (
-                        <Link href={`/search?tag=${tag}`} key={tag}>
-                          <Badge variant="secondary" className="transition-colors hover:bg-accent">{tag}</Badge>
-                        </Link>
-                      ))}
+         <div className="flex-1">
+          <Sidebar>
+            <SiteSidebar />
+            <SidebarRail />
+          </Sidebar>
+          <SidebarInset>
+            <main className="py-8">
+              <article>
+                <header className="container mx-auto px-4 mb-8">
+                  <div className="relative h-64 md:h-96 w-full mb-8 rounded-lg overflow-hidden shadow-lg">
+                    <Image
+                      src={post.coverImage}
+                      alt={post.title}
+                      fill
+                      className="object-cover"
+                      priority
+                      data-ai-hint={post.coverImageHint}
+                    />
+                    <div className="absolute inset-0 bg-black/30" />
                   </div>
 
-                  <h1 className="font-headline text-4xl md:text-5xl font-bold mb-4 text-foreground">
-                      {post.title}
-                  </h1>
+                  <div className="max-w-3xl mx-auto">
+                      <div className="mb-4 flex flex-wrap gap-2">
+                          {post.tags.map((tag) => (
+                            <Link href={`/search?tag=${tag}`} key={tag}>
+                              <Badge variant="secondary" className="transition-colors hover:bg-accent">{tag}</Badge>
+                            </Link>
+                          ))}
+                      </div>
 
-                  <div className="flex items-center gap-4">
-                      <Avatar>
-                          <AvatarImage src="https://picsum.photos/seed/author/40/40" alt={post.author} data-ai-hint="person portrait"/>
-                          <AvatarFallback>{post.author.charAt(0)}</AvatarFallback>
-                      </Avatar>
-                      <div>
-                          <p className="font-semibold text-foreground">{post.author}</p>
-                          <p className="text-sm text-muted-foreground">
-                              Published on {format(new Date(post.date), "MMMM d, yyyy")}
-                          </p>
+                      <h1 className="font-headline text-4xl md:text-5xl font-bold mb-4 text-foreground">
+                          {post.title}
+                      </h1>
+
+                      <div className="flex items-center gap-4">
+                          <Avatar>
+                              <AvatarImage src="https://picsum.photos/seed/author/40/40" alt={post.author} data-ai-hint="person portrait"/>
+                              <AvatarFallback>{post.author.charAt(0)}</AvatarFallback>
+                          </Avatar>
+                          <div>
+                              <p className="font-semibold text-foreground">{post.author}</p>
+                              <p className="text-sm text-muted-foreground">
+                                  Published on {format(new Date(post.date), "MMMM d, yyyy")}
+                              </p>
+                          </div>
                       </div>
                   </div>
-              </div>
-            </header>
+                </header>
 
-            <div className="container mx-auto px-4 max-w-3xl">
-              <PostContent content={post.content} />
-            </div>
+                <div className="container mx-auto px-4 max-w-3xl">
+                  <PostContent content={post.content} />
+                </div>
 
-          </article>
-        </main>
+              </article>
+            </main>
+          </SidebarInset>
+        </div>
       </div>
     </SidebarProvider>
   );

@@ -1,4 +1,5 @@
 
+
 import { PostCard } from "@/components/post-card";
 import { SiteHeader } from "@/components/site-header";
 import { SiteSidebar } from "@/components/site-sidebar";
@@ -6,6 +7,8 @@ import { Sidebar, SidebarInset, SidebarProvider, SidebarRail } from "@/component
 import { getPostsByTag, searchPosts } from "@/lib/posts";
 import type { BlogPost } from "@/types";
 import { Suspense } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card";
 
 interface SearchPageProps {
   searchParams: {
@@ -13,6 +16,39 @@ interface SearchPageProps {
     tag?: string;
   };
 }
+
+function SearchResultsSkeleton() {
+    return (
+        <>
+            <Skeleton className="h-10 w-1/2 mb-8" />
+            <div className="grid gap-12 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+                {[...Array(3)].map((_, i) => (
+                    <Card key={i}>
+                        <CardHeader className="p-0">
+                            <Skeleton className="h-48 w-full" />
+                        </CardHeader>
+                        <CardContent className="p-6">
+                            <Skeleton className="h-4 w-24 mb-4" />
+                            <Skeleton className="h-6 w-full mb-2" />
+                            <Skeleton className="h-4 w-full" />
+                            <Skeleton className="h-4 w-full mt-1" />
+                        </CardContent>
+                        <CardFooter className="p-6 pt-0">
+                            <div className="flex items-center gap-3">
+                                <Skeleton className="h-8 w-8 rounded-full" />
+                                <div className="space-y-1">
+                                    <Skeleton className="h-4 w-20" />
+                                    <Skeleton className="h-3 w-24" />
+                                </div>
+                            </div>
+                        </CardFooter>
+                    </Card>
+                ))}
+            </div>
+        </>
+    )
+}
+
 
 async function SearchResults({ searchParams }: SearchPageProps) {
     let posts: BlogPost[] = [];
@@ -54,7 +90,7 @@ export default function SearchPage({ searchParams }: SearchPageProps) {
           </Sidebar>
           <SidebarInset>
             <main className="container mx-auto px-4 py-8">
-              <Suspense fallback={<div>Loading...</div>}>
+              <Suspense fallback={<SearchResultsSkeleton />}>
                   <SearchResults searchParams={searchParams} />
               </Suspense>
             </main>

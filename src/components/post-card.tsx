@@ -1,3 +1,6 @@
+
+'use client';
+
 import type { BlogPost } from "@/types";
 import Image from "next/image";
 import Link from "next/link";
@@ -11,12 +14,36 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
+import { useEffect, useState } from "react";
+import { summarizeText } from "@/ai/flows/summarize-text-flow";
+import { Skeleton } from "./ui/skeleton";
 
 interface PostCardProps {
   post: BlogPost;
 }
 
 export function PostCard({ post }: PostCardProps) {
+  const [summary, setSummary] = useState('');
+  const [isLoadingSummary, setIsLoadingSummary] = useState(true);
+
+  useEffect(() => {
+    async function generateSummary() {
+      if (post.content) {
+        try {
+          const result = await summarizeText({ text: post.content });
+          setSummary(result.summary);
+        } catch (error) {
+          console.error("Failed to generate summary:", error);
+          setSummary(post.excerpt); // Fallback to excerpt
+        } finally {
+          setIsLoadingSummary(false);
+        }
+      }
+    }
+    generateSummary();
+  }, [post.content, post.excerpt]);
+
+
   return (
     <Card className="flex flex-col overflow-hidden transition-transform duration-300 ease-in-out hover:scale-[1.02] hover:shadow-lg">
       <Link href={`/posts/${post.slug}`} className="block">
@@ -45,7 +72,15 @@ export function PostCard({ post }: PostCardProps) {
           <CardTitle className="font-headline text-2xl mb-2 hover:text-primary transition-colors">
             {post.title}
           </CardTitle>
-          <p className="text-muted-foreground">{post.excerpt}</p>
+          {isLoadingSummary ? (
+            <div className="space-y-2">
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-5/6" />
+            </div>
+          ) : (
+             <p className="text-muted-foreground">{summary || post.excerpt}</p>
+          )}
         </Link>
       </CardContent>
       <CardFooter className="p-6 pt-0">

@@ -15,171 +15,21 @@ import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { Sidebar, SidebarInset, SidebarProvider, SidebarRail } from "@/components/ui/sidebar";
 import { SiteSidebar } from "@/components/site-sidebar";
-
-function BlogSelector({
-  posts,
-  summaries,
-  onSelectPost,
-  selectedPost,
-  isLoading,
-  summariesLoading,
-}: {
-  posts: BlogPost[] | null;
-  summaries: Record<string, string>;
-  onSelectPost: (post: BlogPost) => void;
-  selectedPost: BlogPost | null;
-  isLoading: boolean;
-  summariesLoading: Record<string, boolean>;
-}) {
-  if (isLoading) {
-    return (
-      <div className="space-y-4">
-        {[...Array(5)].map((_, i) => (
-          <div key={i} className="p-4 rounded-lg skew-card">
-            <Skeleton className="h-5 w-3/4 mb-2" />
-            <Skeleton className="h-4 w-full" />
-            <Skeleton className="h-4 w-1/2 mt-1" />
-          </div>
-        ))}
-      </div>
-    );
-  }
-
-  if (!posts || posts.length === 0) {
-    return (
-        <div className="flex items-center justify-center h-full">
-            <p className="text-muted-foreground">No blog posts yet. Create one in the admin dashboard!</p>
-        </div>
-    )
-  }
-
-  return (
-    <div className="space-y-4">
-      {posts.map((post) => (
-        <button
-          key={post.id}
-          onClick={() => onSelectPost(post)}
-          className={cn(
-            "w-full text-left p-4 rounded-2xl transition-all duration-300 skew-card",
-            selectedPost?.id === post.id ? "bg-primary/20 ring-2 ring-primary" : "hover:bg-card-foreground/5"
-          )}
-        >
-          <h3 className="font-headline text-lg font-bold">{post.title}</h3>
-          {summariesLoading[post.id] ? (
-             <div className="space-y-2 mt-2">
-               <Skeleton className="h-4 w-full" />
-               <Skeleton className="h-4 w-5/6" />
-             </div>
-          ) : (
-             <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
-                {summaries[post.id] || post.excerpt}
-             </p>
-          )}
-        </button>
-      ))}
-    </div>
-  );
-}
-
-function PostViewer({ post, isLoading }: { post: BlogPost | null, isLoading: boolean }) {
-  if (isLoading) {
-    return (
-        <article>
-            <header className="mb-8">
-                <Skeleton className="h-64 md:h-80 w-full mb-8 rounded-2xl" />
-                <Skeleton className="h-10 w-3/4 mb-2" />
-                <Skeleton className="h-5 w-1/3" />
-            </header>
-            <div className="space-y-4">
-                <Skeleton className="h-5 w-full" />
-                <Skeleton className="h-5 w-full" />
-                <Skeleton className="h-5 w-5/6" />
-                <Skeleton className="h-5 w-full" />
-            </div>
-        </article>
-    )
-  }
-  
-  if (!post) {
-    return (
-      <div className="flex h-full items-center justify-center">
-        <div className="text-center">
-            <h2 className="font-headline text-2xl font-bold">Welcome to VT blogs</h2>
-            <p className="text-muted-foreground mt-2">Select a post from the left to start reading.</p>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <article>
-        <header className="mb-8">
-            <div className="relative h-64 md:h-80 w-full mb-8 rounded-2xl overflow-hidden shadow-lg">
-                <Image
-                src={post.coverImage}
-                alt={post.title}
-                fill
-                className="object-cover"
-                priority
-                data-ai-hint={post.coverImageHint}
-                />
-                <div className="absolute inset-0 bg-black/20" />
-            </div>
-            <h1 className="font-headline text-4xl md:text-5xl font-bold mb-2 text-foreground">
-                {post.title}
-            </h1>
-            <p className="text-sm text-muted-foreground">
-                By {post.author} on {format(new Date(post.date), "MMMM d, yyyy")}
-            </p>
-        </header>
-        <PostContent content={post.content} />
-    </article>
-  );
-}
-
+import { PostCard } from "@/components/post-card";
 
 export default function Home() {
   const firestore = useFirestore();
   const blogsCollection = useMemoFirebase(
-    () => collection(firestore, "blogs"),
+    () => (firestore ? collection(firestore, 'blogs') : null),
     [firestore]
   );
   const { data: posts, isLoading } = useCollection<BlogPost>(blogsCollection);
 
-  const [summaries, setSummaries] = useState<Record<string, string>>({});
-  const [summariesLoading, setSummariesLoading] = useState<Record<string, boolean>>({});
-  const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null);
-
-  useEffect(() => {
-    if (posts && posts.length > 0 && !selectedPost) {
-        // Sort posts by date descending before selecting the first one
-        const sortedPosts = [...posts].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-        setSelectedPost(sortedPosts[0]);
-    }
-  }, [posts, selectedPost]);
-
-  useEffect(() => {
-    if (posts) {
-      posts.forEach(async (post) => {
-        if (!summaries[post.id] && !summariesLoading[post.id]) {
-          setSummariesLoading((prev) => ({ ...prev, [post.id]: true }));
-          try {
-            const summary = await summarizeText({ text: post.content });
-            setSummaries((prev) => ({ ...prev, [post.id]: summary.summary }));
-          } catch (e) {
-            console.error("Error generating summary for post", post.id, e);
-            setSummaries((prev) => ({ ...prev, [post.id]: post.excerpt }));
-          } finally {
-            setSummariesLoading((prev) => ({ ...prev, [post.id]: false }));
-          }
-        }
-      });
-    }
-  }, [posts, summaries, summariesLoading]);
-
   const sortedPosts = useMemoFirebase(() => {
-      if (!posts) return null;
-      return [...posts].sort((a,b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    if (!posts) return [];
+    return [...posts].sort(
+      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+    );
   }, [posts]);
 
   return (
@@ -187,35 +37,51 @@ export default function Home() {
       <div className="relative flex min-h-screen flex-col">
         <SiteHeader />
         <div className="flex-1">
-            <Sidebar>
-                <SiteSidebar />
-                <SidebarRail />
-            </Sidebar>
-            <SidebarInset>
-                <main className="flex-1 container mx-auto px-4 py-8">
-                    <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-8 h-[calc(100vh-100px)]">
-                        <div className="md:col-span-1 lg:col-span-1">
-                            <ScrollArea className="h-full pr-6">
-                                <BlogSelector 
-                                    posts={sortedPosts} 
-                                    summaries={summaries}
-                                    onSelectPost={setSelectedPost}
-                                    selectedPost={selectedPost}
-                                    isLoading={isLoading}
-                                    summariesLoading={summariesLoading}
-                                />
-                            </ScrollArea>
-                        </div>
-                        <div className="md:col-span-2 lg:col-span-3">
-                            <ScrollArea className="h-full">
-                                <div className="skew-card p-8 lg:p-12">
-                                    <PostViewer post={selectedPost} isLoading={isLoading && !posts} />
-                                </div>
-                            </ScrollArea>
-                        </div>
-                    </div>
-                </main>
-            </SidebarInset>
+          <Sidebar>
+            <SiteSidebar />
+            <SidebarRail />
+          </Sidebar>
+          <SidebarInset>
+            <main className="container mx-auto px-4 py-8">
+              {isLoading && !posts ? (
+                <div className="grid gap-12 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+                  {[...Array(3)].map((_, i) => (
+                    <Card key={i}>
+                      <CardHeader className="p-0">
+                        <Skeleton className="h-48 w-full" />
+                      </CardHeader>
+                      <CardContent className="p-6">
+                        <Skeleton className="h-4 w-24 mb-4" />
+                        <Skeleton className="h-6 w-full mb-2" />
+                        <Skeleton className="h-4 w-full" />
+                        <Skeleton className="h-4 w-full mt-1" />
+                      </CardContent>
+                       <CardFooter className="p-6 pt-0">
+                         <div className="flex items-center gap-3">
+                            <Skeleton className="h-8 w-8 rounded-full" />
+                            <div className="space-y-1">
+                              <Skeleton className="h-4 w-20" />
+                              <Skeleton className="h-3 w-24" />
+                            </div>
+                         </div>
+                       </CardFooter>
+                    </Card>
+                  ))}
+                </div>
+              ) : posts && posts.length > 0 ? (
+                <div className="grid gap-12 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+                  {sortedPosts.map((post) => (
+                    <PostCard key={post.slug} post={post} />
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center">
+                    <h2 className="font-headline text-2xl font-bold">Welcome to VT blogs</h2>
+                    <p className="text-muted-foreground mt-2">No posts yet. Create one in the admin dashboard!</p>
+                </div>
+              )}
+            </main>
+          </SidebarInset>
         </div>
       </div>
     </SidebarProvider>
