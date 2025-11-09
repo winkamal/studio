@@ -84,16 +84,16 @@ export function useCollection<T = any>(
     setError(null);
     
     const handleSuccess = (snapshot: QuerySnapshot<DocumentData>) => {
-      const results: ResultItemType[] = [];
-       for (const doc of snapshot.docs) {
+      const results: ResultItemType[] = snapshot.docs.map(doc => {
           if (options?.noContent) {
-            // If noContent is true, we just need the ID and slug (or other metadata)
-            const { id, slug, date } = doc.data();
-            results.push({ id: doc.id, slug, date } as ResultItemType);
-          } else {
-            results.push({ ...(doc.data() as T), id: doc.id });
+            // When `noContent` is true, we only care about the ID and a few metadata fields.
+            // This is useful for creating lightweight indexes.
+            const { slug, date } = doc.data() as { slug?: string, date?: string };
+            return { id: doc.id, slug, date } as ResultItemType;
           }
-        }
+          // Otherwise, return the full document data.
+          return { ...(doc.data() as T), id: doc.id };
+        });
       setData(results);
       setError(null);
       setIsLoading(false);

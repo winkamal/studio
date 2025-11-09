@@ -8,8 +8,8 @@ import { Badge } from '@/components/ui/badge';
 import { SiteHeader } from '@/components/site-header';
 import Link from 'next/link';
 import { PostContent } from '@/components/post-content';
-import { useFirestore, useMemoFirebase } from '@/firebase';
-import { collection, query, where } from 'firebase/firestore';
+import { useDoc, useFirestore, useMemoFirebase } from '@/firebase';
+import { collection, doc } from 'firebase/firestore';
 import { useCollection } from '@/firebase/firestore/use-collection';
 import type { BlogPost } from '@/types';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -119,21 +119,47 @@ function PostPageSkeleton() {
     );
 }
 
+// A simple hook to create an index of post slugs and their corresponding IDs.
+// This is more efficient than querying the entire collection on every post view.
+function useBlogIndex() {
+  const firestore = useFirestore();
+  const indexQuery = useMemoFirebase(
+    () => firestore ? collection(firestore, 'blogs') : null,
+    [firestore]
+  );
+  // We use `getDocs: true, noContent: true` to fetch the index once without content.
+  const { data, isLoading } = useCollection<{ slug: string }>(indexQuery, { getDocs: true, noContent: true });
+  return { index: data, isLoadingIndex: isLoading };
+}
+
+
 export default function PostPage() {
   const params = useParams();
   const slug = params.slug as string;
-
   const firestore = useFirestore();
-  const postQuery = useMemoFirebase(
-    () => (firestore && slug ? query(collection(firestore, 'blogs'), where('slug', '==', slug)) : null),
-    [firestore, slug]
+
+  // 1. Get the blog index. This is a lightweight list of {id, slug} objects.
+  const { index, isLoadingIndex } = useBlogIndex();
+
+  // 2. Find the ID of the post that matches the current slug.
+  const postId = useMemo(() => {
+    if (!index || !slug) return null;
+    return index.find(post => post.slug === slug)?.id;
+  }, [index, slug]);
+  
+  // 3. Create a memoized document reference to the specific post.
+  const postRef = useMemoFirebase(
+    () => (firestore && postId ? doc(firestore, 'blogs', postId) : null),
+    [firestore, postId]
   );
   
-  const { data: posts, isLoading } = useCollection<BlogPost>(postQuery);
+  // 4. Use `useDoc` to fetch the single document. This is the correct hook for this job.
+  const { data: post, isLoading: isLoadingPost } = useDoc<BlogPost>(postRef);
 
-  const post = useMemo(() => posts?.[0], [posts]);
+  const isLoading = isLoadingIndex || isLoadingPost;
 
   // The 404 is triggered if loading is complete AND there is still no post.
+  // This can happen if the slug is invalid or the post was deleted.
   if (!isLoading && !post) {
     notFound();
   }
