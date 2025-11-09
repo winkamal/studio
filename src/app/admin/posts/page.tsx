@@ -126,8 +126,10 @@ export default function ManagePostsPage() {
                           {format(new Date(post.date), 'yyyy-MM-dd')}
                         </TableCell>
                         <TableCell className="text-right">
-                          <Button variant="ghost" size="icon">
-                            <Edit className="h-4 w-4" />
+                           <Button variant="ghost" size="icon" asChild>
+                            <Link href={`/admin/posts/edit/${post.id}`}>
+                              <Edit className="h-4 w-4" />
+                            </Link>
                           </Button>
                           <Button
                             variant="ghost"
