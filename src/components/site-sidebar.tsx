@@ -86,30 +86,35 @@ export function SiteSidebar() {
       </SidebarHeader>
       <SidebarContent>
         <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              asChild
-              isActive={pathname === "/"}
-              tooltip="Homepage"
-            >
-              <Link href="/">
-                <Home />
-                <span>Home</span>
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              asChild
-              isActive={pathname === "/about"}
-              tooltip="About Me"
-            >
-              <Link href="/about">
-                <Info />
-                <span>About Me</span>
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
+          <div className="flex items-center justify-between pr-2">
+              <div className="flex flex-col gap-1 w-full">
+                <SidebarMenuItem>
+                    <SidebarMenuButton
+                    asChild
+                    isActive={pathname === "/"}
+                    tooltip="Homepage"
+                    >
+                    <Link href="/">
+                        <Home />
+                        <span>Home</span>
+                    </Link>
+                    </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                    <SidebarMenuButton
+                    asChild
+                    isActive={pathname === "/about"}
+                    tooltip="About Me"
+                    >
+                    <Link href="/about">
+                        <Info />
+                        <span>About Me</span>
+                    </Link>
+                    </SidebarMenuButton>
+                </SidebarMenuItem>
+              </div>
+              <ThemeToggle />
+          </div>
         </SidebarMenu>
 
         <SidebarSeparator />
@@ -204,8 +209,7 @@ export function SiteSidebar() {
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
-        <div className="flex items-center justify-between p-2">
-            <ThemeToggle />
+        <div className="flex items-center justify-end p-2">
             <span className="text-xs text-muted-foreground">© 2024 VT blogs</span>
         </div>
       </SidebarFooter>
