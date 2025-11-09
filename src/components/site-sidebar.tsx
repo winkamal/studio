@@ -28,14 +28,32 @@ import {
 import { ThemeToggle } from "./theme-toggle";
 import { useRouter, usePathname } from "next/navigation";
 import type { FormEvent } from "react";
-import { getAllTags, getPosts } from "@/lib/posts";
 import Link from "next/link";
+import { useCollection, useFirestore, useMemoFirebase } from "@/firebase";
+import { BlogPost } from "@/types";
+import { collection } from "firebase/firestore";
 
 export function SiteSidebar() {
   const router = useRouter();
   const pathname = usePathname();
-  const allTags = getAllTags();
-  const recentPosts = getPosts().slice(0, 5);
+  const firestore = useFirestore();
+  
+  const blogsCollection = useMemoFirebase(() => firestore ? collection(firestore, 'blogs') : null, [firestore]);
+  const { data: posts } = useCollection<BlogPost>(blogsCollection);
+
+  const allTags = useMemoFirebase(() => {
+    if (!posts) return [];
+    const tags = posts.flatMap(post => post.tags);
+    return [...new Set(tags)];
+  }, [posts]);
+
+  const recentPosts = useMemoFirebase(() => {
+    if (!posts) return [];
+    return [...posts]
+        .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+        .slice(0, 5);
+  }, [posts]);
+
 
   const handleSearch = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();

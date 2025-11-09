@@ -1,4 +1,4 @@
-import type { Post } from "@/types";
+import type { BlogPost } from "@/types";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -13,7 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 
 interface PostCardProps {
-  post: Post;
+  post: BlogPost;
 }
 
 export function PostCard({ post }: PostCardProps) {

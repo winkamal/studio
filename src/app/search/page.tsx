@@ -4,7 +4,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteSidebar } from "@/components/site-sidebar";
 import { Sidebar, SidebarInset, SidebarProvider, SidebarRail } from "@/components/ui/sidebar";
 import { getPostsByTag, searchPosts } from "@/lib/posts";
-import type { Post } from "@/types";
+import type { BlogPost } from "@/types";
 import { Suspense } from "react";
 
 interface SearchPageProps {
@@ -14,15 +14,15 @@ interface SearchPageProps {
   };
 }
 
-function SearchResults({ searchParams }: SearchPageProps) {
-    let posts: Post[] = [];
+async function SearchResults({ searchParams }: SearchPageProps) {
+    let posts: BlogPost[] = [];
     let heading = "Search Results";
 
     if (searchParams.q) {
-        posts = searchPosts(searchParams.q);
+        posts = await searchPosts(searchParams.q);
         heading = `Results for "${searchParams.q}"`;
     } else if (searchParams.tag) {
-        posts = getPostsByTag(searchParams.tag);
+        posts = await getPostsByTag(searchParams.tag);
         heading = `Posts tagged with #${searchParams.tag}`;
     }
 
