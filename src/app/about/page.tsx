@@ -1,3 +1,4 @@
+
 'use client';
 import { SiteHeader } from "@/components/site-header";
 import { SiteSidebar } from "@/components/site-sidebar";
@@ -78,7 +79,7 @@ export default function AboutPage() {
 
   return (
     <SidebarProvider>
-      <div className="relative flex min-h-screen flex-col">
+      <div className="relative flex flex-col">
         <SiteHeader />
         <div className="flex-1">
           <Sidebar>

@@ -4,15 +4,9 @@ import { SiteHeader } from "@/components/site-header";
 import { useCollection, useFirestore, useMemoFirebase } from "@/firebase";
 import { collection } from "firebase/firestore";
 import type { BlogPost } from "@/types";
-import { summarizeText } from "@/ai/flows/summarize-text-flow";
-import { useEffect, useState } from "react";
+import { useMemo } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import Image from "next/image";
-import { PostContent } from "@/components/post-content";
-import { format } from "date-fns";
-import { cn } from "@/lib/utils";
+import { Card, CardContent, CardHeader, CardFooter } from "@/components/ui/card";
 import { Sidebar, SidebarInset, SidebarProvider, SidebarRail } from "@/components/ui/sidebar";
 import { SiteSidebar } from "@/components/site-sidebar";
 import { PostCard } from "@/components/post-card";
@@ -25,7 +19,7 @@ export default function Home() {
   );
   const { data: posts, isLoading } = useCollection<BlogPost>(blogsCollection);
 
-  const sortedPosts = useMemoFirebase(() => {
+  const sortedPosts = useMemo(() => {
     if (!posts) return [];
     return [...posts].sort(
       (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
@@ -34,7 +28,7 @@ export default function Home() {
 
   return (
     <SidebarProvider>
-      <div className="relative flex min-h-screen flex-col">
+      <div className="relative flex flex-col">
         <SiteHeader />
         <div className="flex-1">
           <Sidebar>

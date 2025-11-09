@@ -39,7 +39,7 @@ export default function PostPage() {
   if (isLoading) {
       return (
         <SidebarProvider>
-          <div className="relative flex min-h-screen flex-col">
+          <div className="relative flex flex-col">
               <SiteHeader />
               <div className="flex-1">
                 <Sidebar>
@@ -78,7 +78,7 @@ export default function PostPage() {
 
   return (
     <SidebarProvider>
-      <div className="relative flex min-h-screen flex-col">
+      <div className="relative flex flex-col">
         <SiteHeader />
          <div className="flex-1">
           <Sidebar>
