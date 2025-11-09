@@ -5,18 +5,20 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, Loader2 } from "lucide-react";
+import { ArrowLeft, Loader2, Upload } from "lucide-react";
 import Link from "next/link";
 import { useDoc, useFirestore, useMemoFirebase } from "@/firebase";
 import { doc } from "firebase/firestore";
 import type { AboutContent } from "@/types";
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent, useRef, type ChangeEvent } from "react";
 import { setDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
 import { hexToHsl, hslToHex } from "@/lib/utils";
+import Image from "next/image";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export default function SiteSettingsPage() {
     const firestore = useFirestore();
@@ -40,6 +42,7 @@ export default function SiteSettingsPage() {
 
     const [isSaving, setIsSaving] = useState(false);
     const { toast } = useToast();
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         if (aboutContent) {
@@ -59,6 +62,17 @@ export default function SiteSettingsPage() {
             setGradientColor4(aboutContent.gradientColor4 || '');
         }
     }, [aboutContent]);
+
+    const handleImageUpload = (e: ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setImageUrl(reader.result as string);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
 
     const handleSave = async (e: FormEvent) => {
         e.preventDefault();
@@ -141,8 +155,24 @@ export default function SiteSettingsPage() {
                                 <Input id="name" value={name} onChange={e => setName(e.target.value)} />
                             </div>
                             <div className="space-y-2">
-                                <Label htmlFor="imageUrl">Image URL</Label>
-                                <Input id="imageUrl" value={imageUrl} onChange={e => setImageUrl(e.target.value)} />
+                                <Label>Profile Image</Label>
+                                <div className="flex items-center gap-4">
+                                    <Avatar className="h-20 w-20">
+                                        <AvatarImage src={imageUrl} alt={name}/>
+                                        <AvatarFallback>{name?.charAt(0)}</AvatarFallback>
+                                    </Avatar>
+                                    <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()}>
+                                        <Upload className="mr-2 h-4 w-4" />
+                                        Upload Image
+                                    </Button>
+                                    <Input 
+                                        type="file" 
+                                        ref={fileInputRef} 
+                                        className="hidden" 
+                                        onChange={handleImageUpload}
+                                        accept="image/*"
+                                    />
+                                </div>
                             </div>
                             <div className="space-y-2">
                                 <Label htmlFor="bio">Bio / Subtitle</Label>
@@ -243,3 +273,5 @@ export default function SiteSettingsPage() {
     </div>
   );
 }
+
+    
