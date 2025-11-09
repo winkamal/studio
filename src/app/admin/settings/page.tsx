@@ -249,10 +249,42 @@ export default function SiteSettingsPage() {
                             <div className="space-y-2">
                                 <Label>Animated Gradient Colors (HSL)</Label>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-                                    <Input value={gradientColor1} onChange={e => setGradientColor1(e.target.value)} placeholder="Color 1"/>
-                                    <Input value={gradientColor2} onChange={e => setGradientColor2(e.target.value)} placeholder="Color 2"/>
-                                    <Input value={gradientColor3} onChange={e => setGradientColor3(e.target.value)} placeholder="Color 3"/>
-                                    <Input value={gradientColor4} onChange={e => setGradientColor4(e.target.value)} placeholder="Color 4"/>
+                                     <div className="relative flex items-center">
+                                        <Input
+                                          type="color"
+                                          value={hslToHex(gradientColor1) || '#FFFFFF'}
+                                          className="absolute h-full w-12 p-1"
+                                          onChange={e => setGradientColor1(hexToHsl(e.target.value) || '')}
+                                        />
+                                        <Input value={gradientColor1} onChange={e => setGradientColor1(e.target.value)} placeholder="Color 1" className="pl-14"/>
+                                    </div>
+                                    <div className="relative flex items-center">
+                                        <Input
+                                          type="color"
+                                          value={hslToHex(gradientColor2) || '#FFFFFF'}
+                                          className="absolute h-full w-12 p-1"
+                                          onChange={e => setGradientColor2(hexToHsl(e.target.value) || '')}
+                                        />
+                                        <Input value={gradientColor2} onChange={e => setGradientColor2(e.target.value)} placeholder="Color 2" className="pl-14"/>
+                                    </div>
+                                    <div className="relative flex items-center">
+                                        <Input
+                                          type="color"
+                                          value={hslToHex(gradientColor3) || '#FFFFFF'}
+                                          className="absolute h-full w-12 p-1"
+                                          onChange={e => setGradientColor3(hexToHsl(e.target.value) || '')}
+                                        />
+                                        <Input value={gradientColor3} onChange={e => setGradientColor3(e.target.value)} placeholder="Color 3" className="pl-14"/>
+                                    </div>
+                                    <div className="relative flex items-center">
+                                        <Input
+                                          type="color"
+                                          value={hslToHex(gradientColor4) || '#FFFFFF'}
+                                          className="absolute h-full w-12 p-1"
+                                          onChange={e => setGradientColor4(hexToHsl(e.target.value) || '')}
+                                        />
+                                        <Input value={gradientColor4} onChange={e => setGradientColor4(e.target.value)} placeholder="Color 4" className="pl-14"/>
+                                    </div>
                                 </div>
                                 <p className="text-xs text-muted-foreground">The animated background uses these four colors.</p>
                             </div>
