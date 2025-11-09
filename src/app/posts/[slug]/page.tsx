@@ -1,187 +1,20 @@
 
 'use client';
-import { notFound, useParams } from 'next/navigation';
-import Image from 'next/image';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { format } from 'date-fns';
-import { Badge } from '@/components/ui/badge';
-import { SiteHeader } from '@/components/site-header';
-import Link from 'next/link';
-import { PostContent } from '@/components/post-content';
-import { useDoc, useFirestore, useMemoFirebase } from '@/firebase';
-import { collection, doc } from 'firebase/firestore';
-import { useCollection } from '@/firebase/firestore/use-collection';
-import type { BlogPost } from '@/types';
-import { Skeleton } from '@/components/ui/skeleton';
-import {
-  SidebarProvider,
-  Sidebar,
-  SidebarRail,
-  SidebarInset,
-} from '@/components/ui/sidebar';
-import { SiteSidebar } from '@/components/site-sidebar';
-import { useMemo } from 'react';
+import { notFound, useParams, useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 
-function PostPageContent({ post }: { post: BlogPost }) {
-  if (!post) {
-    return notFound();
-  }
-
-  return (
-    <main className="py-8">
-      <article>
-        <header className="container mx-auto px-4 mb-8">
-          <div className="relative h-64 md:h-96 w-full mb-8 rounded-lg overflow-hidden shadow-lg">
-            <Image
-              src={post.coverImage}
-              alt={post.title}
-              fill
-              className="object-cover"
-              priority
-              data-ai-hint={post.coverImageHint}
-            />
-            <div className="absolute inset-0 bg-black/30" />
-          </div>
-
-          <div className="max-w-3xl mx-auto">
-            <div className="mb-4 flex flex-wrap gap-2">
-              {post.tags.map((tag) => (
-                <Link href={`/search?tag=${tag}`} key={tag}>
-                  <Badge
-                    variant="secondary"
-                    className="transition-colors hover:bg-accent"
-                  >
-                    {tag}
-                  </Badge>
-                </Link>
-              ))}
-            </div>
-
-            <h1 className="font-headline text-4xl md:text-5xl font-bold mb-4 text-foreground">
-              {post.title}
-            </h1>
-
-            <div className="flex items-center gap-4">
-              <Avatar>
-                <AvatarImage
-                  src="https://picsum.photos/seed/author/40/40"
-                  alt={post.author}
-                  data-ai-hint="person portrait"
-                />
-                <AvatarFallback>{post.author.charAt(0)}</AvatarFallback>
-              </Avatar>
-              <div>
-                <p className="font-semibold text-foreground">{post.author}</p>
-                <p className="text-sm text-muted-foreground">
-                  Published on {format(new Date(post.date), 'MMMM d, yyyy')}
-                </p>
-              </div>
-            </div>
-          </div>
-        </header>
-
-        <div className="container mx-auto px-4 max-w-3xl">
-          <PostContent content={post.content} />
-        </div>
-      </article>
-    </main>
-  );
-}
-
-function PostPageSkeleton() {
-    return (
-        <main className="py-8">
-          <div className="container mx-auto px-4">
-            <Skeleton className="h-96 w-full mb-8" />
-            <div className="max-w-3xl mx-auto">
-                <div className="flex gap-2 mb-4">
-                    <Skeleton className="h-6 w-20" />
-                    <Skeleton className="h-6 w-24" />
-                </div>
-              <Skeleton className="h-12 w-3/4 mb-4" />
-              <div className="flex items-center gap-4 mb-8">
-                <Skeleton className="h-12 w-12 rounded-full" />
-                <div className="space-y-2">
-                  <Skeleton className="h-4 w-24" />
-                  <Skeleton className="h-4 w-32" />
-                </div>
-              </div>
-              <div className="space-y-4">
-                <Skeleton className="h-6 w-full" />
-                <Skeleton className="h-6 w-full" />
-                <Skeleton className="h-6 w-5/6" />
-                 <Skeleton className="h-6 w-full mt-4" />
-                <Skeleton className="h-6 w-3/4" />
-              </div>
-            </div>
-          </div>
-        </main>
-    );
-}
-
-// A simple hook to create an index of post slugs and their corresponding IDs.
-// This is more efficient than querying the entire collection on every post view.
-function useBlogIndex() {
-  const firestore = useFirestore();
-  const indexQuery = useMemoFirebase(
-    () => firestore ? collection(firestore, 'blogs') : null,
-    [firestore]
-  );
-  // We use `getDocs: true, noContent: true` to fetch the index once without content.
-  const { data, isLoading } = useCollection<{ slug: string }>(indexQuery, { getDocs: true, noContent: true });
-  return { index: data, isLoadingIndex: isLoading };
-}
-
-
-export default function PostPage() {
+export default function PostRedirectPage() {
+  const router = useRouter();
   const params = useParams();
   const slug = params.slug as string;
-  const firestore = useFirestore();
 
-  // 1. Get the blog index. This is a lightweight list of {id, slug} objects.
-  const { index, isLoadingIndex } = useBlogIndex();
+  useEffect(() => {
+    if (slug) {
+      router.replace(`/search?slug=${slug}`);
+    } else {
+        notFound();
+    }
+  }, [slug, router]);
 
-  // 2. Find the ID of the post that matches the current slug.
-  const postId = useMemo(() => {
-    if (!index || !slug) return null;
-    return index.find(post => post.slug === slug)?.id;
-  }, [index, slug]);
-  
-  // 3. Create a memoized document reference to the specific post.
-  const postRef = useMemoFirebase(
-    () => (firestore && postId ? doc(firestore, 'blogs', postId) : null),
-    [firestore, postId]
-  );
-  
-  // 4. Use `useDoc` to fetch the single document. This is the correct hook for this job.
-  const { data: post, isLoading: isLoadingPost } = useDoc<BlogPost>(postRef);
-
-  const isLoading = isLoadingIndex || isLoadingPost;
-
-  // The 404 is triggered if loading is complete AND there is still no post.
-  // This can happen if the slug is invalid or the post was deleted.
-  if (!isLoading && !post) {
-    notFound();
-  }
-
-  return (
-    <SidebarProvider>
-      <div className="relative flex flex-col">
-        <SiteHeader />
-        <div className="flex-1">
-          <Sidebar>
-            <SiteSidebar />
-            <SidebarRail />
-          </Sidebar>
-          <SidebarInset>
-            {isLoading || !post ? (
-               <PostPageSkeleton />
-            ) : (
-              <PostPageContent post={post} />
-            )}
-          </SidebarInset>
-        </div>
-      </div>
-    </SidebarProvider>
-  );
+  return null;
 }
