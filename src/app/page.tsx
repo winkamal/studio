@@ -33,7 +33,7 @@ export default function Home() {
             <HeroBanner />
             <main className="container mx-auto px-4 py-8">
               {isLoading && !posts ? (
-                <div className="grid gap-12 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+                <div className="grid gap-12 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 justify-center">
                   {[...Array(3)].map((_, i) => (
                     <Card key={i}>
                       <CardHeader className="p-0">
@@ -58,7 +58,7 @@ export default function Home() {
                   ))}
                 </div>
               ) : posts && posts.length > 0 ? (
-                <div className="grid gap-12 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+                <div className="grid gap-12 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 justify-center">
                   {posts.map((post) => (
                     <PostCard key={post.slug} post={post} />
                   ))}
