@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ArrowLeft, Loader2, Upload } from "lucide-react";
 import Link from "next/link";
-import { useDoc, useFirestore, useMemoFirebase } from "@/firebase";
+import { useAuth, useDoc, useFirestore, useMemoFirebase, useUser } from "@/firebase";
 import { doc } from "firebase/firestore";
 import type { AboutContent } from "@/types";
 import { useEffect, useState, type FormEvent, useRef, type ChangeEvent } from "react";
@@ -19,11 +19,15 @@ import { Separator } from "@/components/ui/separator";
 import { hexToHsl, hslToHex } from "@/lib/utils";
 import Image from "next/image";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { updatePassword } from "firebase/auth";
 
 export default function SiteSettingsPage() {
     const firestore = useFirestore();
     const aboutRef = useMemoFirebase(() => firestore ? doc(firestore, 'settings', 'about') : null, [firestore]);
     const { data: aboutContent, isLoading: isAboutLoading } = useDoc<AboutContent>(aboutRef);
+    const { user } = useUser();
+    const auth = useAuth();
+
 
     const [name, setName] = useState('');
     const [bio, setBio] = useState('');
@@ -39,6 +43,9 @@ export default function SiteSettingsPage() {
     const [gradientColor2, setGradientColor2] = useState('');
     const [gradientColor3, setGradientColor3] = useState('');
     const [gradientColor4, setGradientColor4] = useState('');
+
+    const [newPassword, setNewPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
 
     const [isSaving, setIsSaving] = useState(false);
     const { toast } = useToast();
@@ -76,41 +83,71 @@ export default function SiteSettingsPage() {
 
     const handleSave = async (e: FormEvent) => {
         e.preventDefault();
-        if (!aboutRef) return;
         
         setIsSaving(true);
-        const updatedContent: Partial<AboutContent> = { 
-            name, 
-            bio, 
-            content, 
-            imageUrl,
-            twitterUrl,
-            githubUrl,
-            linkedinUrl,
-            backgroundColor,
-            blogFontColor,
-            gradientColor1,
-            gradientColor2,
-            gradientColor3,
-            gradientColor4,
-        };
         
-        try {
-            await setDocumentNonBlocking(aboutRef, updatedContent, { merge: true });
-            toast({
-                title: "Settings Saved",
-                description: "Your site settings have been updated.",
-            });
-        } catch (error) {
-            console.error(error);
-            toast({
-                variant: "destructive",
-                title: "Error",
-                description: "Could not save settings.",
-            });
-        } finally {
-            setIsSaving(false);
+        // Handle password update
+        if (newPassword) {
+            if (newPassword !== confirmPassword) {
+                toast({ variant: "destructive", title: "Error", description: "Passwords do not match." });
+                setIsSaving(false);
+                return;
+            }
+            if (newPassword.length < 6) {
+                toast({ variant: "destructive", title: "Error", description: "Password must be at least 6 characters long." });
+                setIsSaving(false);
+                return;
+            }
+            if (user) {
+                try {
+                    await updatePassword(user, newPassword);
+                    toast({ title: "Password Updated", description: "Your admin password has been changed." });
+                    setNewPassword('');
+                    setConfirmPassword('');
+                } catch (error: any) {
+                    console.error(error);
+                    toast({ variant: "destructive", title: "Password Update Failed", description: error.message || "Could not update password." });
+                    setIsSaving(false);
+                    return;
+                }
+            }
         }
+        
+        // Handle other settings
+        if (aboutRef) {
+            const updatedContent: Partial<AboutContent> = { 
+                name, 
+                bio, 
+                content, 
+                imageUrl,
+                twitterUrl,
+                githubUrl,
+                linkedinUrl,
+                backgroundColor,
+                blogFontColor,
+                gradientColor1,
+                gradientColor2,
+                gradientColor3,
+                gradientColor4,
+            };
+            
+            try {
+                await setDocumentNonBlocking(aboutRef, updatedContent, { merge: true });
+                toast({
+                    title: "Settings Saved",
+                    description: "Your site settings have been updated.",
+                });
+            } catch (error) {
+                console.error(error);
+                toast({
+                    variant: "destructive",
+                    title: "Error",
+                    description: "Could not save settings.",
+                });
+            }
+        }
+
+        setIsSaving(false);
     }
 
   return (
@@ -181,6 +218,25 @@ export default function SiteSettingsPage() {
                             <div className="space-y-2">
                                 <Label htmlFor="aboutContent">About Page Content</Label>
                                 <Textarea id="aboutContent" value={content} onChange={e => setContent(e.target.value)} className="min-h-40" />
+                            </div>
+                        </div>
+
+                        <Separator />
+
+                         <h3 className="text-lg font-medium text-foreground font-headline">Admin Account</h3>
+                        <div className="space-y-4 rounded-lg border p-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="username">Username</Label>
+                                <Input id="username" value="admin" readOnly disabled />
+                                <p className="text-xs text-muted-foreground">The admin username cannot be changed.</p>
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="newPassword">New Password</Label>
+                                <Input id="newPassword" type="password" value={newPassword} onChange={e => setNewPassword(e.target.value)} placeholder="Leave blank to keep current password" />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="confirmPassword">Confirm New Password</Label>
+                                <Input id="confirmPassword" type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} />
                             </div>
                         </div>
 
@@ -295,7 +351,7 @@ export default function SiteSettingsPage() {
                 <div className="flex justify-end mt-6">
                 <Button type="submit" disabled={isSaving}>
                     {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    Save Changes
+                    Save All Changes
                 </Button>
                 </div>
             </CardContent>
@@ -305,3 +361,5 @@ export default function SiteSettingsPage() {
     </div>
   );
 }
+
+    
