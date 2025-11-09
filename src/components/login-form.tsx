@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
 
 import { Button } from "@/components/ui/button";
 import {
@@ -28,7 +28,7 @@ const formSchema = z.object({
   username: z.literal("admin", {
     errorMap: () => ({ message: "Username must be 'admin'." }),
   }),
-  password: z.string().min(1, { message: "Password is required." }),
+  password: z.string().min(6, { message: "Password must be at least 6 characters." }),
 });
 
 const ADMIN_EMAIL = "admin@example.com";
@@ -50,20 +50,41 @@ export function LoginForm() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     try {
+      // First, try to sign in
       await signInWithEmailAndPassword(auth, ADMIN_EMAIL, values.password);
       toast({
         title: "Login Successful",
         description: "Redirecting to dashboard...",
       });
       router.push("/admin/dashboard");
-    } catch (error) {
-      console.error("Login Error:", error);
-      toast({
-        variant: "destructive",
-        title: "Login Failed",
-        description: "Invalid password for admin user.",
-      });
-      setIsLoading(false);
+    } catch (error: any) {
+        // If sign-in fails, check if it's because the user doesn't exist
+        if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
+            try {
+                // Attempt to create the user
+                await createUserWithEmailAndPassword(auth, ADMIN_EMAIL, values.password);
+                toast({
+                    title: "Admin Account Created",
+                    description: "Redirecting to dashboard...",
+                });
+                router.push("/admin/dashboard");
+            } catch (creationError: any) {
+                 toast({
+                    variant: "destructive",
+                    title: "Login Failed",
+                    description: creationError.message || "An unexpected error occurred during sign-up.",
+                });
+                setIsLoading(false);
+            }
+        } else {
+            // Handle other login errors
+            toast({
+                variant: "destructive",
+                title: "Login Failed",
+                description: error.message || "Invalid credentials. Please try again.",
+            });
+            setIsLoading(false);
+        }
     }
   }
 

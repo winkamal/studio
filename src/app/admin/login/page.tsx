@@ -10,8 +10,8 @@ export default function AdminLoginPage() {
           <h1 className="text-center font-headline text-3xl font-bold">
             Life Canvas
           </h1>
-          <p className="text-sm text-muted-foreground">
-            Admin Login. (Hint: you can use any email and a password of at least 6 characters)
+          <p className="text-sm text-muted-foreground text-center">
+            Admin Login. Enter 'admin' and a password of at least 6 characters. If the account doesn't exist, it will be created.
           </p>
         </div>
         <LoginForm />
