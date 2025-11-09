@@ -5,7 +5,7 @@ import { Icons } from "@/components/icons";
 
 export function SiteHeader() {
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-white/10 bg-background/50 backdrop-blur-lg">
+    <header className="w-full border-b">
       <div className="container flex h-14 items-center">
         <div className="mr-4 flex items-center md:hidden">
           <SidebarTrigger />
