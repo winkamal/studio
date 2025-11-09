@@ -7,7 +7,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { cn } from "@/lib/utils";
 import { FirebaseClientProvider } from "@/firebase/client-provider";
 import Link from "next/link";
-import { SiteSidebar } from "@/components/site-sidebar";
+import DynamicStyles from "@/components/dynamic-styles";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
@@ -44,6 +44,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <FirebaseClientProvider>
+              <DynamicStyles />
               {children}
               <Link href="/admin/login" className="fixed bottom-4 left-4 z-50 text-xs text-muted-foreground hover:text-foreground transition-colors">
                 Admin Login

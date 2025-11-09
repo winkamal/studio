@@ -29,6 +29,14 @@ export default function SiteSettingsPage() {
     const [twitterUrl, setTwitterUrl] = useState('');
     const [githubUrl, setGithubUrl] = useState('');
     const [linkedinUrl, setLinkedinUrl] = useState('');
+
+    const [backgroundColor, setBackgroundColor] = useState('');
+    const [foregroundColor, setForegroundColor] = useState('');
+    const [gradientColor1, setGradientColor1] = useState('');
+    const [gradientColor2, setGradientColor2] = useState('');
+    const [gradientColor3, setGradientColor3] = useState('');
+    const [gradientColor4, setGradientColor4] = useState('');
+
     const [isSaving, setIsSaving] = useState(false);
     const { toast } = useToast();
 
@@ -41,6 +49,13 @@ export default function SiteSettingsPage() {
             setTwitterUrl(aboutContent.twitterUrl || '');
             setGithubUrl(aboutContent.githubUrl || '');
             setLinkedinUrl(aboutContent.linkedinUrl || '');
+
+            setBackgroundColor(aboutContent.backgroundColor || '');
+            setForegroundColor(aboutContent.foregroundColor || '');
+            setGradientColor1(aboutContent.gradientColor1 || '');
+            setGradientColor2(aboutContent.gradientColor2 || '');
+            setGradientColor3(aboutContent.gradientColor3 || '');
+            setGradientColor4(aboutContent.gradientColor4 || '');
         }
     }, [aboutContent]);
 
@@ -56,7 +71,13 @@ export default function SiteSettingsPage() {
             imageUrl,
             twitterUrl,
             githubUrl,
-            linkedinUrl
+            linkedinUrl,
+            backgroundColor,
+            foregroundColor,
+            gradientColor1,
+            gradientColor2,
+            gradientColor3,
+            gradientColor4,
         };
         
         try {
@@ -78,7 +99,7 @@ export default function SiteSettingsPage() {
     }
 
   return (
-    <div className="flex flex-col bg-muted/40">
+    <div className="flex-1 flex flex-col bg-muted/40 pb-8">
        <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
           <Button variant="outline" size="sm" asChild>
             <Link href="/admin/dashboard">
@@ -149,10 +170,38 @@ export default function SiteSettingsPage() {
                                 <Input id="linkedinUrl" value={linkedinUrl} onChange={e => setLinkedinUrl(e.target.value)} placeholder="https://linkedin.com/in/your-profile"/>
                             </div>
                         </div>
+
+                        <Separator />
+
+                        <h3 className="text-lg font-medium text-foreground font-headline">Theme Customization</h3>
+                        <div className="space-y-4 rounded-lg border p-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <Label htmlFor="backgroundColor">Background Color</Label>
+                                    <Input id="backgroundColor" value={backgroundColor} onChange={e => setBackgroundColor(e.target.value)} placeholder="e.g., 240 20% 98%"/>
+                                    <p className="text-xs text-muted-foreground">Enter HSL values (e.g., 240 10% 3.9%).</p>
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="foregroundColor">Foreground Color</Label>
+                                    <Input id="foregroundColor" value={foregroundColor} onChange={e => setForegroundColor(e.target.value)} placeholder="e.g., 240 10% 3.9%"/>
+                                    <p className="text-xs text-muted-foreground">Enter HSL values (e.g., 240 10% 3.9%).</p>
+                                </div>
+                            </div>
+                            <div className="space-y-2">
+                                <Label>Animated Gradient Colors (HSL)</Label>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                                    <Input value={gradientColor1} onChange={e => setGradientColor1(e.target.value)} placeholder="Color 1"/>
+                                    <Input value={gradientColor2} onChange={e => setGradientColor2(e.target.value)} placeholder="Color 2"/>
+                                    <Input value={gradientColor3} onChange={e => setGradientColor3(e.target.value)} placeholder="Color 3"/>
+                                    <Input value={gradientColor4} onChange={e => setGradientColor4(e.target.value)} placeholder="Color 4"/>
+                                </div>
+                                <p className="text-xs text-muted-foreground">The animated background uses these four colors.</p>
+                            </div>
+                        </div>
                     </>
                 )}
                 
-                <div className="flex justify-end">
+                <div className="flex justify-end mt-6">
                 <Button type="submit" disabled={isSaving}>
                     {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                     Save Changes

@@ -33,4 +33,10 @@ export type AboutContent = {
     twitterUrl?: string;
     githubUrl?: string;
     linkedinUrl?: string;
+    backgroundColor?: string;
+    foregroundColor?: string;
+    gradientColor1?: string;
+    gradientColor2?: string;
+    gradientColor3?: string;
+    gradientColor4?: string;
 };
