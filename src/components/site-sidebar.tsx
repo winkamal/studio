@@ -31,7 +31,8 @@ import type { FormEvent } from "react";
 import Link from "next/link";
 import { useCollection, useDoc, useFirestore, useMemoFirebase } from "@/firebase";
 import { AboutContent, BlogPost } from "@/types";
-import { collection, doc } from "firebase/firestore";
+import { collection, doc, query, orderBy, limit } from "firebase/firestore";
+import { useMemo } from "react";
 
 export function SiteSidebar() {
   const router = useRouter();
@@ -43,20 +44,18 @@ export function SiteSidebar() {
 
   const aboutRef = useMemoFirebase(() => firestore ? doc(firestore, 'settings', 'about') : null, [firestore]);
   const { data: aboutContent } = useDoc<AboutContent>(aboutRef);
+  
+  const recentPostsQuery = useMemoFirebase(() => {
+    if (!firestore) return null;
+    return query(collection(firestore, 'blogs'), orderBy('date', 'desc'), limit(5));
+  }, [firestore]);
+  const { data: recentPosts } = useCollection<BlogPost>(recentPostsQuery);
 
-  const allTags = useMemoFirebase(() => {
+  const allTags = useMemo(() => {
     if (!posts) return [];
     const tags = posts.flatMap(post => post.tags);
     return [...new Set(tags)];
   }, [posts]);
-
-  const recentPosts = useMemoFirebase(() => {
-    if (!posts) return [];
-    return [...posts]
-        .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-        .slice(0, 5);
-  }, [posts]);
-
 
   const handleSearch = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -172,7 +171,7 @@ export function SiteSidebar() {
         <SidebarGroup>
             <SidebarGroupLabel>Recent Posts</SidebarGroupLabel>
             <SidebarMenu>
-                {recentPosts.map(post => (
+                {recentPosts?.map(post => (
                     <SidebarMenuItem key={post.slug}>
                         <SidebarMenuButton asChild isActive={pathname === `/posts/${post.slug}`} size="sm" tooltip={post.title}>
                              <Link href={`/posts/${post.slug}`}>

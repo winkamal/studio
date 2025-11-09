@@ -29,7 +29,7 @@ import {
 } from '@/components/ui/table';
 import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
 import { BlogPost } from '@/types';
-import { collection, deleteDoc, doc } from 'firebase/firestore';
+import { collection, deleteDoc, doc, query, orderBy } from 'firebase/firestore';
 import { ArrowLeft, Edit, Loader2, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
@@ -38,11 +38,11 @@ import { useToast } from '@/hooks/use-toast';
 
 export default function ManagePostsPage() {
   const firestore = useFirestore();
-  const blogsCollection = useMemoFirebase(
-    () => collection(firestore, 'blogs'),
+  const blogsQuery = useMemoFirebase(
+    () => firestore ? query(collection(firestore, 'blogs'), orderBy('date', 'desc')) : null,
     [firestore]
   );
-  const { data: posts, isLoading } = useCollection<BlogPost>(blogsCollection);
+  const { data: posts, isLoading } = useCollection<BlogPost>(blogsQuery);
 
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
   const [showDeleteAlert, setShowDeleteAlert] = useState(false);
@@ -81,7 +81,7 @@ export default function ManagePostsPage() {
 
   return (
     <>
-      <div className="flex min-h-screen flex-col bg-muted/40">
+      <div className="flex flex-col bg-muted/40">
         <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
           <Button variant="outline" size="sm" asChild>
             <Link href="/admin/dashboard">

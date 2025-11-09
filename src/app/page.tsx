@@ -2,7 +2,7 @@
 "use client";
 import { SiteHeader } from "@/components/site-header";
 import { useCollection, useFirestore, useMemoFirebase } from "@/firebase";
-import { collection } from "firebase/firestore";
+import { collection, query, orderBy } from "firebase/firestore";
 import type { BlogPost } from "@/types";
 import { useMemo } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -13,18 +13,11 @@ import { PostCard } from "@/components/post-card";
 
 export default function Home() {
   const firestore = useFirestore();
-  const blogsCollection = useMemoFirebase(
-    () => (firestore ? collection(firestore, 'blogs') : null),
+  const blogsQuery = useMemoFirebase(
+    () => (firestore ? query(collection(firestore, 'blogs'), orderBy('date', 'desc')) : null),
     [firestore]
   );
-  const { data: posts, isLoading } = useCollection<BlogPost>(blogsCollection);
-
-  const sortedPosts = useMemo(() => {
-    if (!posts) return [];
-    return [...posts].sort(
-      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-    );
-  }, [posts]);
+  const { data: posts, isLoading } = useCollection<BlogPost>(blogsQuery);
 
   return (
     <SidebarProvider>
@@ -64,7 +57,7 @@ export default function Home() {
                 </div>
               ) : posts && posts.length > 0 ? (
                 <div className="grid gap-12 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-                  {sortedPosts.map((post) => (
+                  {posts.map((post) => (
                     <PostCard key={post.slug} post={post} />
                   ))}
                 </div>

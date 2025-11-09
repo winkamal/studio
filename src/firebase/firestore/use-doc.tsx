@@ -29,7 +29,7 @@ export interface UseDocResult<T> {
  * Handles nullable references.
  * 
  * IMPORTANT! YOU MUST MEMOIZE the inputted memoizedTargetRefOrQuery or BAD THINGS WILL HAPPEN
- * use useMemo to memoize it per React guidence.  Also make sure that it's dependencies are stable
+ * use useMemoFirebase to memoize it per React guidence.  Also make sure that it's dependencies are stable
  * references
  *
  *
@@ -53,6 +53,11 @@ export function useDoc<T = any>(
       setIsLoading(false);
       setError(null);
       return;
+    }
+    
+    if (!(memoizedDocRef as any).__memo) {
+      console.error(memoizedDocRef);
+      throw new Error('The document reference passed to useDoc must be memoized with useMemoFirebase.');
     }
 
     setIsLoading(true);
