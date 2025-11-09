@@ -13,7 +13,8 @@ import Image from "next/image";
 import { PostContent } from "@/components/post-content";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
-import { SidebarProvider } from "@/components/ui/sidebar";
+import { Sidebar, SidebarInset, SidebarProvider, SidebarRail } from "@/components/ui/sidebar";
+import { SiteSidebar } from "@/components/site-sidebar";
 
 function BlogSelector({
   posts,
@@ -167,29 +168,37 @@ export default function Home() {
     <SidebarProvider>
       <div className="relative flex min-h-screen flex-col">
         <SiteHeader />
-        <main className="flex-1 container mx-auto px-4 py-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-8 h-[calc(100vh-100px)]">
-              <div className="md:col-span-1 lg:col-span-1">
-                  <ScrollArea className="h-full pr-6">
-                      <BlogSelector 
-                          posts={sortedPosts} 
-                          summaries={summaries}
-                          onSelectPost={setSelectedPost}
-                          selectedPost={selectedPost}
-                          isLoading={isLoading}
-                          summariesLoading={summariesLoading}
-                      />
-                  </ScrollArea>
-              </div>
-              <div className="md:col-span-2 lg:col-span-3">
-                  <ScrollArea className="h-full">
-                      <div className="skew-card p-8 lg:p-12">
-                          <PostViewer post={selectedPost} />
-                      </div>
-                  </ScrollArea>
-              </div>
-          </div>
-        </main>
+        <div className="flex-1">
+            <Sidebar>
+                <SiteSidebar />
+                <SidebarRail />
+            </Sidebar>
+            <SidebarInset>
+                <main className="flex-1 container mx-auto px-4 py-8">
+                    <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-8 h-[calc(100vh-100px)]">
+                        <div className="md:col-span-1 lg:col-span-1">
+                            <ScrollArea className="h-full pr-6">
+                                <BlogSelector 
+                                    posts={sortedPosts} 
+                                    summaries={summaries}
+                                    onSelectPost={setSelectedPost}
+                                    selectedPost={selectedPost}
+                                    isLoading={isLoading}
+                                    summariesLoading={summariesLoading}
+                                />
+                            </ScrollArea>
+                        </div>
+                        <div className="md:col-span-2 lg:col-span-3">
+                            <ScrollArea className="h-full">
+                                <div className="skew-card p-8 lg:p-12">
+                                    <PostViewer post={selectedPost} />
+                                </div>
+                            </ScrollArea>
+                        </div>
+                    </div>
+                </main>
+            </SidebarInset>
+        </div>
       </div>
     </SidebarProvider>
   );
