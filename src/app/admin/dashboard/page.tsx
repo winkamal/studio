@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { PlusCircle, Edit, Settings, LogOut, Home } from "lucide-react";
@@ -9,13 +10,13 @@ export default function AdminDashboardPage() {
       <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
           <h1 className="font-headline text-2xl font-bold">Dashboard</h1>
           <div className="ml-auto flex items-center gap-2">
-            <Button variant="outline" size="sm" asChild>
+            <Button variant="secondary" size="sm" asChild>
                 <Link href="/">
                     <Home className="h-4 w-4 mr-2"/>
                     View Site
                 </Link>
             </Button>
-            <Button variant="outline" size="sm">
+            <Button variant="secondary" size="sm">
               <LogOut className="h-4 w-4 mr-2" />
               Logout
             </Button>
@@ -51,7 +52,7 @@ export default function AdminDashboardPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Button className="w-full" variant="secondary" asChild>
+              <Button className="w-full" asChild>
                 <Link href="/admin/posts">View All Posts</Link>
               </Button>
             </CardContent>
@@ -68,7 +69,7 @@ export default function AdminDashboardPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Button className="w-full" variant="secondary" asChild>
+              <Button className="w-full" asChild>
                 <Link href="/admin/settings">Customize Site</Link>
               </Button>
             </CardContent>
