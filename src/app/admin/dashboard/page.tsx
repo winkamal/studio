@@ -70,7 +70,7 @@ export default function AdminDashboardPage() {
             </CardHeader>
             <CardContent>
               <Button className="w-full" asChild>
-                <Link href="/admin/settings">Customize Site</Link>
+                <Link href="/admin/settings">Customize</Link>
               </Button>
             </CardContent>
           </Card>
