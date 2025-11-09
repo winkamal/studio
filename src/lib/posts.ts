@@ -1,15 +1,16 @@
-import type { BlogPost, Post } from "@/types";
+
+import type { BlogPost } from "@/types";
 import { collection, getDocs, query as firestoreQuery, where } from "firebase/firestore";
-import { getSdks } from "@/firebase";
+import { initializeFirebase } from "@/firebase";
 
 // This file is used for providing static data for some pages, 
 // but will be modified to fetch from Firestore.
 
 // Note: The top-level `getFirestore` instance might not be initialized when this module is first imported.
 // We will get the instance when needed inside the functions.
+const { firestore } = initializeFirebase();
 
 export async function getPosts(): Promise<BlogPost[]> {
-  const { firestore } = getSdks();
   const postsCollection = collection(firestore, 'blogs');
   const postSnapshot = await getDocs(postsCollection);
   const postList = postSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as BlogPost));
@@ -17,7 +18,6 @@ export async function getPosts(): Promise<BlogPost[]> {
 }
 
 export async function getPost(slug: string): Promise<BlogPost | undefined> {
-  const { firestore } = getSdks();
   const postsCollection = collection(firestore, 'blogs');
   const q = firestoreQuery(postsCollection, where("slug", "==", slug));
   const postSnapshot = await getDocs(q);

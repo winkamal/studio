@@ -1,4 +1,5 @@
 
+'use client';
 
 import { PostCard } from "@/components/post-card";
 import { SiteHeader } from "@/components/site-header";
@@ -9,6 +10,8 @@ import type { BlogPost } from "@/types";
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card";
+import { useSearchParams } from 'next/navigation'
+import { useEffect, useState } from "react";
 
 interface SearchPageProps {
   searchParams: {
@@ -50,16 +53,34 @@ function SearchResultsSkeleton() {
 }
 
 
-async function SearchResults({ searchParams }: SearchPageProps) {
-    let posts: BlogPost[] = [];
+function SearchResults({ searchParams }: SearchPageProps) {
+    const [posts, setPosts] = useState<BlogPost[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
     let heading = "Search Results";
 
+    useEffect(() => {
+      const fetchPosts = async () => {
+        setIsLoading(true);
+        if (searchParams.q) {
+            const results = await searchPosts(searchParams.q);
+            setPosts(results);
+        } else if (searchParams.tag) {
+            const results = await getPostsByTag(searchParams.tag);
+            setPosts(results);
+        }
+        setIsLoading(false);
+      }
+      fetchPosts();
+    }, [searchParams]);
+    
     if (searchParams.q) {
-        posts = await searchPosts(searchParams.q);
         heading = `Results for "${searchParams.q}"`;
-    } else if (searchParams.tag) {
-        posts = await getPostsByTag(searchParams.tag);
-        heading = `Posts tagged with #${searchParams.tag}`;
+    } else if (search_params.tag) {
+        heading = `Posts tagged with #${search_params.tag}`;
+    }
+
+    if (isLoading) {
+        return <SearchResultsSkeleton />
     }
 
     return (
@@ -78,10 +99,14 @@ async function SearchResults({ searchParams }: SearchPageProps) {
     )
 }
 
-export default function SearchPage({ searchParams }: SearchPageProps) {
+function SearchPageInternal() {
+  const searchParams = useSearchParams();
+  const q = searchParams.get('q');
+  const tag = searchParams.get('tag');
+
   return (
     <SidebarProvider>
-      <div className="relative flex flex-col">
+      <div className="relative flex flex-col min-h-screen">
         <SiteHeader />
         <div className="flex-1">
           <Sidebar>
@@ -90,13 +115,20 @@ export default function SearchPage({ searchParams }: SearchPageProps) {
           </Sidebar>
           <SidebarInset>
             <main className="container mx-auto px-4 py-8">
-              <Suspense fallback={<SearchResultsSkeleton />}>
-                  <SearchResults searchParams={searchParams} />
-              </Suspense>
+              <SearchResults searchParams={{ q, tag }} />
             </main>
           </SidebarInset>
         </div>
       </div>
     </SidebarProvider>
   );
+}
+
+
+export default function SearchPage() {
+    return (
+        <Suspense fallback={<SearchResultsSkeleton />}>
+            <SearchPageInternal />
+        </Suspense>
+    )
 }

@@ -23,14 +23,9 @@ export default function PostPage() {
 
   const firestore = useFirestore();
   
-  const postsCollection = useMemoFirebase(
-    () => firestore ? collection(firestore, 'blogs') : null, 
-    [firestore]
-  );
-  
   const postQuery = useMemoFirebase(
-    () => postsCollection ? query(postsCollection, where("slug", "==", slug)) : null,
-    [postsCollection, slug]
+    () => firestore ? query(collection(firestore, 'blogs'), where("slug", "==", slug)) : null,
+    [firestore, slug]
   );
 
   const { data: posts, isLoading } = useCollection<BlogPost>(postQuery);
@@ -39,7 +34,7 @@ export default function PostPage() {
   if (isLoading) {
       return (
         <SidebarProvider>
-          <div className="relative flex flex-col">
+          <div className="relative flex flex-col min-h-screen">
               <SiteHeader />
               <div className="flex-1">
                 <Sidebar>
@@ -72,13 +67,19 @@ export default function PostPage() {
       )
   }
 
-  if (!post) {
+  if (!post && !isLoading) {
     return notFound();
+  }
+
+  // This check is to prevent rendering with incomplete `post` data during the brief moment
+  // between `isLoading` being false and `post` being fully populated.
+  if (!post) {
+      return null; // or a more specific loading/error state
   }
 
   return (
     <SidebarProvider>
-      <div className="relative flex flex-col">
+      <div className="relative flex flex-col min-h-screen">
         <SiteHeader />
          <div className="flex-1">
           <Sidebar>
