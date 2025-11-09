@@ -13,7 +13,8 @@ import { collection, where, query } from "firebase/firestore";
 import { useCollection } from "@/firebase/firestore/use-collection";
 import type { BlogPost } from "@/types";
 import { Skeleton } from "@/components/ui/skeleton";
-import { SidebarProvider, Sidebar, SiteSidebar, SidebarRail, SidebarInset } from "@/components/ui/sidebar";
+import { SidebarProvider, Sidebar, SidebarRail, SidebarInset } from "@/components/ui/sidebar";
+import { SiteSidebar } from "@/components/site-sidebar";
 
 
 export default function PostPage() {
