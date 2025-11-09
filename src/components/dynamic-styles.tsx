@@ -19,7 +19,8 @@ function DynamicStyles() {
       --gradient-color-3: ${settings?.gradientColor3 ? `hsl(${settings.gradientColor3})` : 'hsl(var(--background))'};
       --gradient-color-4: ${settings?.gradientColor4 ? `hsl(${settings.gradientColor4})` : 'hsl(var(--muted))'};
     }
-    .prose {
+    
+    html:not(.dark) .prose {
         ${settings?.blogFontColor ? `color: hsl(${settings.blogFontColor});` : ''}
     }
   `;
