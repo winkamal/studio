@@ -7,7 +7,7 @@ import type { BlogPost } from "@/types";
 import { summarizeText } from "@/ai/flows/summarize-text-flow";
 import { useEffect, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import Image from "next/image";
 import { PostContent } from "@/components/post-content";
