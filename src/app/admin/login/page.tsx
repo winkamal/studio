@@ -11,7 +11,7 @@ export default function AdminLoginPage() {
             Life Canvas
           </h1>
           <p className="text-sm text-muted-foreground">
-            Admin Login
+            Admin Login. (Hint: you can use any email and a password of at least 6 characters)
           </p>
         </div>
         <LoginForm />

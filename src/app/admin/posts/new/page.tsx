@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import { useState, type FormEvent } from "react";
-import { useFirestore, useAuth } from "@/firebase";
+import { useFirestore, useUser } from "@/firebase";
 import { collection } from "firebase/firestore";
 import { addDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 import { useToast } from "@/hooks/use-toast";
@@ -22,7 +23,7 @@ export default function NewPostPage() {
   const [isLoading, setIsLoading] =useState(false);
 
   const firestore = useFirestore();
-  const { user } = useAuth();
+  const { user } = useUser();
   const { toast } = useToast();
   const router = useRouter();
 
