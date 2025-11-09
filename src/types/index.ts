@@ -39,4 +39,7 @@ export type AboutContent = {
     gradientColor2?: string;
     gradientColor3?: string;
     gradientColor4?: string;
+    heroImageUrl?: string;
+    heroTitle?: string;
+    heroSubtitle?: string;
 };

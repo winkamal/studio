@@ -46,16 +46,22 @@ export default function SiteSettingsPage() {
 
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    
+    const [heroImageUrl, setHeroImageUrl] = useState('');
+    const [heroTitle, setHeroTitle] = useState('');
+    const [heroSubtitle, setHeroSubtitle] = useState('');
+
 
     const [isSaving, setIsSaving] = useState(false);
     const { toast } = useToast();
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const heroImageInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         if (aboutContent) {
             setName(aboutContent.name || '');
             setBio(aboutContent.bio || '');
-            setContent(aboutContent.content || '');
+setContent(aboutContent.content || '');
             setImageUrl(aboutContent.imageUrl || '');
             setTwitterUrl(aboutContent.twitterUrl || '');
             setGithubUrl(aboutContent.githubUrl || '');
@@ -67,6 +73,10 @@ export default function SiteSettingsPage() {
             setGradientColor2(aboutContent.gradientColor2 || '');
             setGradientColor3(aboutContent.gradientColor3 || '');
             setGradientColor4(aboutContent.gradientColor4 || '');
+            
+            setHeroImageUrl(aboutContent.heroImageUrl || '');
+            setHeroTitle(aboutContent.heroTitle || '');
+            setHeroSubtitle(aboutContent.heroSubtitle || '');
         }
     }, [aboutContent]);
 
@@ -76,6 +86,17 @@ export default function SiteSettingsPage() {
             const reader = new FileReader();
             reader.onloadend = () => {
                 setImageUrl(reader.result as string);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+    
+    const handleHeroImageUpload = (e: ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setHeroImageUrl(reader.result as string);
             };
             reader.readAsDataURL(file);
         }
@@ -129,6 +150,9 @@ export default function SiteSettingsPage() {
                 gradientColor2,
                 gradientColor3,
                 gradientColor4,
+                heroImageUrl,
+                heroTitle,
+                heroSubtitle,
             };
             
             try {
@@ -185,6 +209,41 @@ export default function SiteSettingsPage() {
                     </div>
                 ) : (
                     <>
+                        <h3 className="text-lg font-medium text-foreground font-headline">Hero Banner Settings</h3>
+                        <div className="space-y-4 rounded-lg border p-4">
+                            <div className="space-y-2">
+                                <Label>Banner Image</Label>
+                                <div className="flex items-center gap-4">
+                                    {heroImageUrl && (
+                                      <div className="relative w-48 h-24 rounded-md overflow-hidden">
+                                        <Image src={heroImageUrl} alt="Hero Banner Preview" fill className="object-cover" />
+                                      </div>
+                                    )}
+                                    <Button type="button" variant="outline" onClick={() => heroImageInputRef.current?.click()}>
+                                        <Upload className="mr-2 h-4 w-4" />
+                                        Upload Banner
+                                    </Button>
+                                    <Input 
+                                        type="file" 
+                                        ref={heroImageInputRef} 
+                                        className="hidden" 
+                                        onChange={handleHeroImageUpload}
+                                        accept="image/*"
+                                    />
+                                </div>
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="heroTitle">Banner Title</Label>
+                                <Input id="heroTitle" value={heroTitle} onChange={e => setHeroTitle(e.target.value)} />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="heroSubtitle">Banner Subtitle</Label>
+                                <Textarea id="heroSubtitle" value={heroSubtitle} onChange={e => setHeroSubtitle(e.target.value)} />
+                            </div>
+                        </div>
+
+                        <Separator />
+                        
                         <h3 className="text-lg font-medium text-foreground font-headline">About Me Section</h3>
                         <div className="space-y-4 rounded-lg border p-4">
                             <div className="space-y-2">
