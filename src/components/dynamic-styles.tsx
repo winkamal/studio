@@ -8,7 +8,12 @@ import { doc } from "firebase/firestore";
 function DynamicStyles() {
   const firestore = useFirestore();
   const settingsRef = useMemoFirebase(() => firestore ? doc(firestore, 'settings', 'about') : null, [firestore]);
-  const { data: settings } = useDoc<AboutContent>(settingsRef);
+  const { data: settings, isLoading } = useDoc<AboutContent>(settingsRef);
+
+  // Do not render styles until settings have been loaded to prevent hydration mismatch.
+  if (isLoading || !settings) {
+    return null;
+  }
 
   const styles = `
     html:not(.dark) {
