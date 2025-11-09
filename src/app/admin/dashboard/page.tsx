@@ -34,8 +34,8 @@ export default function AdminDashboardPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Button className="w-full">
-                Start Writing
+              <Button className="w-full" asChild>
+                <Link href="/admin/posts/new">Start Writing</Link>
               </Button>
             </CardContent>
           </Card>
@@ -51,8 +51,8 @@ export default function AdminDashboardPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Button className="w-full" variant="secondary">
-                View All Posts
+              <Button className="w-full" variant="secondary" asChild>
+                <Link href="/admin/posts">View All Posts</Link>
               </Button>
             </CardContent>
           </Card>
@@ -68,8 +68,8 @@ export default function AdminDashboardPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Button className="w-full" variant="secondary">
-                Customize Site
+              <Button className="w-full" variant="secondary" asChild>
+                <Link href="/admin/settings">Customize Site</Link>
               </Button>
             </CardContent>
           </Card>
