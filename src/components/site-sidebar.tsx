@@ -86,9 +86,8 @@ export function SiteSidebar() {
       </SidebarHeader>
       <SidebarContent>
         <SidebarMenu>
-          <div className="flex items-center justify-between pr-2">
-              <div className="flex flex-col gap-1 w-full">
-                <SidebarMenuItem>
+            <div className="flex items-center justify-between pr-2">
+                <SidebarMenuItem className="w-full">
                     <SidebarMenuButton
                     asChild
                     isActive={pathname === "/"}
@@ -100,21 +99,20 @@ export function SiteSidebar() {
                     </Link>
                     </SidebarMenuButton>
                 </SidebarMenuItem>
-                <SidebarMenuItem>
-                    <SidebarMenuButton
-                    asChild
-                    isActive={pathname === "/about"}
-                    tooltip="About Me"
-                    >
-                    <Link href="/about">
-                        <Info />
-                        <span>About Me</span>
-                    </Link>
-                    </SidebarMenuButton>
-                </SidebarMenuItem>
-              </div>
-              <ThemeToggle />
-          </div>
+                <ThemeToggle />
+            </div>
+            <SidebarMenuItem>
+                <SidebarMenuButton
+                asChild
+                isActive={pathname === "/about"}
+                tooltip="About Me"
+                >
+                <Link href="/about">
+                    <Info />
+                    <span>About Me</span>
+                </Link>
+                </SidebarMenuButton>
+            </SidebarMenuItem>
         </SidebarMenu>
 
         <SidebarSeparator />
