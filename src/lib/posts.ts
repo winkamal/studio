@@ -18,14 +18,8 @@ export async function getPosts(): Promise<BlogPost[]> {
 }
 
 export async function getPost(slug: string): Promise<BlogPost | undefined> {
-  const postsCollection = collection(firestore, 'blogs');
-  const q = firestoreQuery(postsCollection, where("slug", "==", slug));
-  const postSnapshot = await getDocs(q);
-  if (postSnapshot.empty) {
-    return undefined;
-  }
-  const doc = postSnapshot.docs[0];
-  return { id: doc.id, ...doc.data() } as BlogPost;
+    const posts = await getPosts();
+    return posts.find(post => post.slug === slug);
 }
 
 export async function getPostsByTag(tag: string): Promise<BlogPost[]> {
@@ -38,7 +32,6 @@ export async function searchPosts(query: string): Promise<BlogPost[]> {
     const allPosts = await getPosts();
     return allPosts.filter(post => 
         post.title.toLowerCase().includes(lowerCaseQuery) || 
-        post.excerpt.toLowerCase().includes(lowerCaseQuery) ||
         post.content.toLowerCase().includes(lowerCaseQuery)
     );
 }
