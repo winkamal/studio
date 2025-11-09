@@ -6,6 +6,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { cn } from "@/lib/utils";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import Link from "next/link";
+import { FirebaseClientProvider } from "@/firebase/client-provider";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
@@ -41,12 +42,14 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <SidebarProvider>
-            {children}
-            <Link href="/admin/login" className="fixed bottom-4 left-4 z-50 text-xs text-muted-foreground hover:text-foreground transition-colors">
-              Admin Login
-            </Link>
-          </SidebarProvider>
+          <FirebaseClientProvider>
+            <SidebarProvider>
+              {children}
+              <Link href="/admin/login" className="fixed bottom-4 left-4 z-50 text-xs text-muted-foreground hover:text-foreground transition-colors">
+                Admin Login
+              </Link>
+            </SidebarProvider>
+          </FirebaseClientProvider>
           <Toaster />
         </ThemeProvider>
       </body>
