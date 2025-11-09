@@ -25,9 +25,13 @@ import { useAuth } from "@/firebase";
 
 
 const formSchema = z.object({
-  email: z.string().email({ message: "Please enter a valid email." }),
+  username: z.literal("admin", {
+    errorMap: () => ({ message: "Username must be 'admin'." }),
+  }),
   password: z.string().min(1, { message: "Password is required." }),
 });
+
+const ADMIN_EMAIL = "admin@example.com";
 
 export function LoginForm() {
   const router = useRouter();
@@ -38,7 +42,7 @@ export function LoginForm() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: "",
+      username: "admin",
       password: "",
     },
   });
@@ -46,7 +50,7 @@ export function LoginForm() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     try {
-      await signInWithEmailAndPassword(auth, values.email, values.password);
+      await signInWithEmailAndPassword(auth, ADMIN_EMAIL, values.password);
       toast({
         title: "Login Successful",
         description: "Redirecting to dashboard...",
@@ -57,7 +61,7 @@ export function LoginForm() {
       toast({
         variant: "destructive",
         title: "Login Failed",
-        description: "Invalid email or password.",
+        description: "Invalid password for admin user.",
       });
       setIsLoading(false);
     }
@@ -73,12 +77,12 @@ export function LoginForm() {
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <FormField
               control={form.control}
-              name="email"
+              name="username"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel>Username</FormLabel>
                   <FormControl>
-                    <Input placeholder="admin@example.com" {...field} />
+                    <Input placeholder="admin" {...field} readOnly />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
