@@ -210,14 +210,14 @@ function SearchResults() {
 function SearchPageInternal() {
   return (
     <SidebarProvider>
-      <div className="relative flex flex-col">
+      <div className="relative flex flex-col min-h-screen">
         <SiteHeader />
-        <div className="flex-1">
-          <Sidebar variant="sidebar">
+        <div className="flex-1 flex">
+          <Sidebar>
             <SiteSidebar />
             <SidebarRail />
           </Sidebar>
-          <SidebarInset>
+          <SidebarInset className="flex-1">
             <main className="container mx-auto px-4 py-8">
               <SearchResults />
             </main>
