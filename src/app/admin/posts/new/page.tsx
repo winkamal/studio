@@ -54,7 +54,7 @@ export default function NewPostPage() {
         title,
         content,
         slug,
-        author: user.displayName || "Vibha",
+        author: "Vibha",
         date: new Date().toISOString(),
         tags: tags.split(',').map(tag => tag.trim().toLowerCase()),
         coverImage: `https://picsum.photos/seed/${slug}/1080/720`,
