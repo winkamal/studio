@@ -21,7 +21,7 @@ function DynamicStyles() {
     }
     
     html:not(.dark) .prose {
-        ${settings?.blogFontColor ? `color: hsl(${settings.blogFontColor});` : ''}
+        ${settings?.backgroundColor && settings?.blogFontColor ? `color: hsl(${settings.blogFontColor});` : ''}
     }
   `;
 
