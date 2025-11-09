@@ -5,20 +5,14 @@ import { PostCard } from "@/components/post-card";
 import { SiteHeader } from "@/components/site-header";
 import { SiteSidebar } from "@/components/site-sidebar";
 import { Sidebar, SidebarInset, SidebarProvider, SidebarRail } from "@/components/ui/sidebar";
-import { getPostsByTag, searchPosts } from "@/lib/posts";
 import type { BlogPost } from "@/types";
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card";
 import { useSearchParams } from 'next/navigation'
 import { useEffect, useState } from "react";
-
-interface SearchPageProps {
-  searchParams: {
-    q?: string;
-    tag?: string;
-  };
-}
+import { useCollection, useFirestore, useMemoFirebase } from "@/firebase";
+import { collection, query, where } from "firebase/firestore";
 
 function SearchResultsSkeleton() {
     return (
@@ -53,30 +47,55 @@ function SearchResultsSkeleton() {
 }
 
 
-function SearchResults({ searchParams }: SearchPageProps) {
+function SearchResults() {
+    const searchParams = useSearchParams();
+    const q = searchParams.get('q');
+    const tag = searchParams.get('tag');
+
+    const firestore = useFirestore();
+
+    // Query for tags
+    const tagQuery = useMemoFirebase(
+      () => (firestore && tag ? query(collection(firestore, 'blogs'), where('tags', 'array-contains', tag)) : null),
+      [firestore, tag]
+    );
+    const { data: tagPosts, isLoading: isLoadingTags } = useCollection<BlogPost>(tagQuery);
+
+    // For general search, we fetch all and filter client-side for simplicity.
+    // For a larger app, a dedicated search solution like Algolia/Elasticsearch would be better.
+    const blogsCollection = useMemoFirebase(
+        () => (firestore && q ? collection(firestore, 'blogs') : null),
+        [firestore, q]
+    );
+    const { data: allPosts, isLoading: isLoadingAll } = useCollection<BlogPost>(blogsCollection);
+
     const [posts, setPosts] = useState<BlogPost[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    
     let heading = "Search Results";
 
     useEffect(() => {
-      const fetchPosts = async () => {
-        setIsLoading(true);
-        if (searchParams.q) {
-            const results = await searchPosts(searchParams.q);
-            setPosts(results);
-        } else if (searchParams.tag) {
-            const results = await getPostsByTag(searchParams.tag);
-            setPosts(results);
+        if (tag) {
+            setPosts(tagPosts || []);
+            setIsLoading(isLoadingTags);
+        } else if (q && allPosts) {
+            const lowerCaseQuery = q.toLowerCase();
+            const filtered = allPosts.filter(post => 
+                post.title.toLowerCase().includes(lowerCaseQuery) || 
+                post.content.toLowerCase().includes(lowerCaseQuery)
+            );
+            setPosts(filtered);
+            setIsLoading(isLoadingAll);
+        } else if (!q && !tag) {
+            setPosts([]);
+            setIsLoading(false);
         }
-        setIsLoading(false);
-      }
-      fetchPosts();
-    }, [searchParams]);
+    }, [q, tag, tagPosts, allPosts, isLoadingTags, isLoadingAll]);
     
-    if (searchParams.q) {
-        heading = `Results for "${searchParams.q}"`;
-    } else if (search_params.tag) {
-        heading = `Posts tagged with #${search_params.tag}`;
+    if (q) {
+        heading = `Results for "${q}"`;
+    } else if (tag) {
+        heading = `Posts tagged with #${tag}`;
     }
 
     if (isLoading) {
@@ -89,7 +108,7 @@ function SearchResults({ searchParams }: SearchPageProps) {
             {posts.length > 0 ? (
                 <div className="grid gap-12 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
                     {posts.map((post) => (
-                        <PostCard key={post.slug} post={post} />
+                        <PostCard key={post.id} post={post} />
                     ))}
                 </div>
             ) : (
@@ -100,13 +119,9 @@ function SearchResults({ searchParams }: SearchPageProps) {
 }
 
 function SearchPageInternal() {
-  const searchParams = useSearchParams();
-  const q = searchParams.get('q');
-  const tag = searchParams.get('tag');
-
   return (
     <SidebarProvider>
-      <div className="relative flex flex-col min-h-screen">
+      <div className="relative flex flex-col">
         <SiteHeader />
         <div className="flex-1">
           <Sidebar>
@@ -115,7 +130,7 @@ function SearchPageInternal() {
           </Sidebar>
           <SidebarInset>
             <main className="container mx-auto px-4 py-8">
-              <SearchResults searchParams={{ q, tag }} />
+              <SearchResults />
             </main>
           </SidebarInset>
         </div>

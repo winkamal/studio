@@ -9,9 +9,8 @@ import { SiteHeader } from '@/components/site-header';
 import Link from 'next/link';
 import { PostContent } from '@/components/post-content';
 import { useFirestore, useMemoFirebase } from '@/firebase';
-import { collection, doc } from 'firebase/firestore';
+import { collection, query, where } from 'firebase/firestore';
 import { useCollection } from '@/firebase/firestore/use-collection';
-import { useDoc } from '@/firebase/firestore/use-doc';
 import type { BlogPost } from '@/types';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
@@ -23,37 +22,7 @@ import {
 import { SiteSidebar } from '@/components/site-sidebar';
 import { useMemo } from 'react';
 
-function PostPageContent({ postId }: { postId: string }) {
-  const firestore = useFirestore();
-  const postRef = useMemoFirebase(
-    () => (firestore ? doc(firestore, 'blogs', postId) : null),
-    [firestore, postId]
-  );
-  const { data: post, isLoading } = useDoc<BlogPost>(postRef);
-
-  if (isLoading) {
-    return (
-        <main className="container mx-auto px-4 py-8">
-          <Skeleton className="h-96 w-full mb-8" />
-          <div className="max-w-3xl mx-auto">
-            <Skeleton className="h-12 w-3/4 mb-4" />
-            <div className="flex items-center gap-4">
-              <Skeleton className="h-12 w-12 rounded-full" />
-              <div className="space-y-2">
-                <Skeleton className="h-4 w-24" />
-                <Skeleton className="h-4 w-32" />
-              </div>
-            </div>
-            <div className="mt-8 space-y-4">
-              <Skeleton className="h-6 w-full" />
-              <Skeleton className="h-6 w-full" />
-              <Skeleton className="h-6 w-5/6" />
-            </div>
-          </div>
-        </main>
-    );
-  }
-
+function PostPageContent({ post }: { post: BlogPost }) {
   if (!post) {
     return notFound();
   }
@@ -119,31 +88,44 @@ function PostPageContent({ postId }: { postId: string }) {
   );
 }
 
+function PostPageSkeleton() {
+    return (
+        <main className="container mx-auto px-4 py-8">
+          <Skeleton className="h-96 w-full mb-8" />
+          <div className="max-w-3xl mx-auto">
+            <Skeleton className="h-12 w-3/4 mb-4" />
+            <div className="flex items-center gap-4">
+              <Skeleton className="h-12 w-12 rounded-full" />
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-4 w-32" />
+              </div>
+            </div>
+            <div className="mt-8 space-y-4">
+              <Skeleton className="h-6 w-full" />
+              <Skeleton className="h-6 w-full" />
+              <Skeleton className="h-6 w-5/6" />
+            </div>
+          </div>
+        </main>
+    );
+}
+
 export default function PostPage() {
   const params = useParams();
   const slug = params.slug as string;
 
   const firestore = useFirestore();
-  const blogsCollection = useMemoFirebase(
-    () => (firestore ? collection(firestore, 'blogs') : null),
-    [firestore]
+  const postQuery = useMemoFirebase(
+    () => (firestore && slug ? query(collection(firestore, 'blogs'), where('slug', '==', slug)) : null),
+    [firestore, slug]
   );
   
-  // Fetch all posts to find the one with the matching slug.
-  // This is a lightweight query as we're not fetching content here.
-  const { data: posts, isLoading: arePostsLoading } = useCollection<BlogPost>(
-    blogsCollection,
-    { getDocs: true, noContent: true }
-  );
+  const { data: posts, isLoading } = useCollection<BlogPost>(postQuery);
 
-  const postId = useMemo(() => {
-    if (!posts) return null;
-    const foundPost = posts.find((p) => p.slug === slug);
-    return foundPost?.id ?? null;
-  }, [posts, slug]);
-  
-  // This happens if the slug is invalid after checking all posts.
-  if (!arePostsLoading && !postId) {
+  const post = posts?.[0];
+
+  if (!isLoading && !post) {
     notFound();
   }
 
@@ -157,28 +139,11 @@ export default function PostPage() {
             <SidebarRail />
           </Sidebar>
           <SidebarInset>
-            {arePostsLoading ? (
-               <main className="container mx-auto px-4 py-8">
-                  <Skeleton className="h-96 w-full mb-8" />
-                  <div className="max-w-3xl mx-auto">
-                      <Skeleton className="h-12 w-3/4 mb-4" />
-                      <div className="flex items-center gap-4">
-                          <Skeleton className="h-12 w-12 rounded-full" />
-                          <div className="space-y-2">
-                              <Skeleton className="h-4 w-24" />
-                              <Skeleton className="h-4 w-32" />
-                          </div>
-                      </div>
-                      <div className="mt-8 space-y-4">
-                          <Skeleton className="h-6 w-full" />
-                          <Skeleton className="h-6 w-full" />
-                          <Skeleton className="h-6 w-5/6" />
-                      </div>
-                  </div>
-              </main>
-            ) : postId ? (
-              <PostPageContent postId={postId} />
-            ) : null}
+            {isLoading || !post ? (
+               <PostPageSkeleton />
+            ) : (
+              <PostPageContent post={post} />
+            )}
           </SidebarInset>
         </div>
       </div>
