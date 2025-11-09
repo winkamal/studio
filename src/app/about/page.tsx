@@ -23,13 +23,15 @@ function AboutPageContent({ content }: { content: AboutContent }) {
 
             <div className="flex flex-col md:flex-row items-center gap-8 mb-12">
                 <div className="relative w-48 h-48 rounded-full overflow-hidden shadow-lg flex-shrink-0">
-                <Image
-                    src={content.imageUrl}
-                    alt={content.name}
-                    fill
-                    className="object-cover"
-                    data-ai-hint="person smiling"
-                />
+                {content.imageUrl && (
+                    <Image
+                        src={content.imageUrl}
+                        alt={content.name}
+                        fill
+                        className="object-cover"
+                        data-ai-hint="person smiling"
+                    />
+                )}
                 </div>
                 <div>
                     <h2 className="font-headline text-3xl font-bold mb-2">{content.name}</h2>
