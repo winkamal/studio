@@ -1,5 +1,6 @@
 import type { Post } from "@/types";
 
+// This file is now used for providing static data for some pages, but the main blog logic fetches from Firestore.
 const posts: Post[] = [];
 
 export function getPosts(): Post[] {
