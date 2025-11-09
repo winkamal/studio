@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardFooter } from "@/components/ui/card"
 import { Sidebar, SidebarInset, SidebarProvider, SidebarRail } from "@/components/ui/sidebar";
 import { SiteSidebar } from "@/components/site-sidebar";
 import { PostCard } from "@/components/post-card";
+import { HeroBanner } from "@/components/hero-banner";
 
 export default function Home() {
   const firestore = useFirestore();
@@ -29,6 +30,7 @@ export default function Home() {
             <SidebarRail />
           </Sidebar>
           <SidebarInset>
+            <HeroBanner />
             <main className="container mx-auto px-4 py-8">
               {isLoading && !posts ? (
                 <div className="grid gap-12 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
