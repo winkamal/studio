@@ -20,7 +20,7 @@ export default function AboutPage() {
               <div className="max-w-3xl mx-auto">
                 <header className="mb-12 text-center">
                   <h1 className="font-headline text-5xl font-bold mb-4">
-                    About Life Canvas
+                    About VT blogs
                   </h1>
                   <p className="text-xl text-muted-foreground">
                     Capturing the fleeting moments that make life beautiful.
@@ -40,7 +40,7 @@ export default function AboutPage() {
                   <div>
                       <h2 className="font-headline text-3xl font-bold mb-2">Vibha</h2>
                       <p className="text-lg text-muted-foreground mb-4">
-                          Hi there! I'm Vibha, the voice and heart behind Life Canvas. I started this blog as a personal project to document the small, everyday moments that often go unnoticed but hold the most meaning.
+                          Hi there! I'm Vibha, the voice and heart behind VT blogs. I started this blog as a personal project to document the small, everyday moments that often go unnoticed but hold the most meaning.
                       </p>
                   </div>
                 </div>

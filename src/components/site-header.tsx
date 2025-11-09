@@ -1,3 +1,4 @@
+
 import Link from "next/link";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Icons } from "@/components/icons";
@@ -12,7 +13,7 @@ export function SiteHeader() {
         <Link href="/" className="flex items-center space-x-2">
             <Icons.logo className="h-6 w-6" />
             <span className="font-bold font-headline text-lg sm:inline-block">
-              Life Canvas
+              VT blogs
             </span>
         </Link>
       </div>

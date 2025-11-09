@@ -1,3 +1,4 @@
+
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
@@ -11,7 +12,7 @@ import { SiteSidebar } from "@/components/site-sidebar";
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata: Metadata = {
-  title: "Life Canvas",
+  title: "VT blogs",
   description: "A blog about daily life moments.",
 };
 

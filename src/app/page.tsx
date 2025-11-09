@@ -1,3 +1,4 @@
+
 "use client";
 import { SiteHeader } from "@/components/site-header";
 import { useCollection, useFirestore, useMemoFirebase } from "@/firebase";
@@ -84,7 +85,7 @@ function PostViewer({ post }: { post: BlogPost | null }) {
     return (
       <div className="flex h-full items-center justify-center">
         <div className="text-center">
-            <h2 className="font-headline text-2xl font-bold">Welcome to Life Canvas</h2>
+            <h2 className="font-headline text-2xl font-bold">Welcome to VT blogs</h2>
             <p className="text-muted-foreground mt-2">Select a post from the left to start reading.</p>
         </div>
       </div>
