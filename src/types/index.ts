@@ -1,3 +1,4 @@
+
 export type Post = {
   slug: string;
   title: string;
@@ -29,4 +30,7 @@ export type AboutContent = {
     imageUrl: string;
     bio: string;
     content: string;
+    twitterUrl?: string;
+    githubUrl?: string;
+    linkedinUrl?: string;
 };

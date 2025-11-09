@@ -29,9 +29,9 @@ import { ThemeToggle } from "./theme-toggle";
 import { useRouter, usePathname } from "next/navigation";
 import type { FormEvent } from "react";
 import Link from "next/link";
-import { useCollection, useFirestore, useMemoFirebase } from "@/firebase";
-import { BlogPost } from "@/types";
-import { collection } from "firebase/firestore";
+import { useCollection, useDoc, useFirestore, useMemoFirebase } from "@/firebase";
+import { AboutContent, BlogPost } from "@/types";
+import { collection, doc } from "firebase/firestore";
 
 export function SiteSidebar() {
   const router = useRouter();
@@ -40,6 +40,9 @@ export function SiteSidebar() {
   
   const blogsCollection = useMemoFirebase(() => firestore ? collection(firestore, 'blogs') : null, [firestore]);
   const { data: posts } = useCollection<BlogPost>(blogsCollection);
+
+  const aboutRef = useMemoFirebase(() => firestore ? doc(firestore, 'settings', 'about') : null, [firestore]);
+  const { data: aboutContent } = useDoc<AboutContent>(aboutRef);
 
   const allTags = useMemoFirebase(() => {
     if (!posts) return [];
@@ -70,15 +73,15 @@ export function SiteSidebar() {
         <div className="flex items-center gap-3 p-2">
           <Avatar>
             <AvatarImage
-              src="https://picsum.photos/seed/author/100/100"
-              alt="Vibha"
+              src={aboutContent?.imageUrl || "https://picsum.photos/seed/author/100/100"}
+              alt={aboutContent?.name || "Vibha"}
               data-ai-hint="person portrait"
             />
-            <AvatarFallback>V</AvatarFallback>
+            <AvatarFallback>{aboutContent?.name?.charAt(0) || "V"}</AvatarFallback>
           </Avatar>
           <div className="flex flex-col">
-            <span className="font-semibold text-lg">Vibha</span>
-            <span className="text-sm text-muted-foreground">Author & Dreamer</span>
+            <span className="font-semibold text-lg">{aboutContent?.name || "Vibha"}</span>
+            <span className="text-sm text-muted-foreground">{aboutContent?.bio || "Author & Dreamer"}</span>
           </div>
         </div>
       </SidebarHeader>
@@ -115,30 +118,36 @@ export function SiteSidebar() {
         <SidebarGroup>
           <SidebarGroupLabel>Follow Me</SidebarGroupLabel>
           <SidebarMenu>
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild tooltip="Twitter / X">
-                <a href="#" target="_blank">
-                  <Twitter />
-                  <span>Twitter / X</span>
-                </a>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild tooltip="GitHub">
-                <a href="#" target="_blank">
-                  <Github />
-                  <span>GitHub</span>
-                </a>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild tooltip="LinkedIn">
-                <a href="#" target="_blank">
-                  <Linkedin />
-                  <span>LinkedIn</span>
-                </a>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
+            {aboutContent?.twitterUrl && (
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild tooltip="Twitter / X">
+                  <a href={aboutContent.twitterUrl} target="_blank" rel="noopener noreferrer">
+                    <Twitter />
+                    <span>Twitter / X</span>
+                  </a>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            )}
+            {aboutContent?.githubUrl && (
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild tooltip="GitHub">
+                  <a href={aboutContent.githubUrl} target="_blank" rel="noopener noreferrer">
+                    <Github />
+                    <span>GitHub</span>
+                  </a>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            )}
+            {aboutContent?.linkedinUrl && (
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild tooltip="LinkedIn">
+                  <a href={aboutContent.linkedinUrl} target="_blank" rel="noopener noreferrer">
+                    <Linkedin />
+                    <span>LinkedIn</span>
+                  </a>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            )}
           </SidebarMenu>
         </SidebarGroup>
 

@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,6 +15,7 @@ import { setDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
+import { Separator } from "@/components/ui/separator";
 
 export default function SiteSettingsPage() {
     const firestore = useFirestore();
@@ -24,15 +26,21 @@ export default function SiteSettingsPage() {
     const [bio, setBio] = useState('');
     const [content, setContent] = useState('');
     const [imageUrl, setImageUrl] = useState('');
+    const [twitterUrl, setTwitterUrl] = useState('');
+    const [githubUrl, setGithubUrl] = useState('');
+    const [linkedinUrl, setLinkedinUrl] = useState('');
     const [isSaving, setIsSaving] = useState(false);
     const { toast } = useToast();
 
     useEffect(() => {
         if (aboutContent) {
-            setName(aboutContent.name);
-            setBio(aboutContent.bio);
-            setContent(aboutContent.content);
-            setImageUrl(aboutContent.imageUrl);
+            setName(aboutContent.name || '');
+            setBio(aboutContent.bio || '');
+            setContent(aboutContent.content || '');
+            setImageUrl(aboutContent.imageUrl || '');
+            setTwitterUrl(aboutContent.twitterUrl || '');
+            setGithubUrl(aboutContent.githubUrl || '');
+            setLinkedinUrl(aboutContent.linkedinUrl || '');
         }
     }, [aboutContent]);
 
@@ -41,7 +49,15 @@ export default function SiteSettingsPage() {
         if (!aboutRef) return;
         
         setIsSaving(true);
-        const updatedContent = { name, bio, content, imageUrl };
+        const updatedContent: Partial<AboutContent> = { 
+            name, 
+            bio, 
+            content, 
+            imageUrl,
+            twitterUrl,
+            githubUrl,
+            linkedinUrl
+        };
         
         try {
             await setDocumentNonBlocking(aboutRef, updatedContent, { merge: true });
@@ -62,7 +78,7 @@ export default function SiteSettingsPage() {
     }
 
   return (
-    <div className="flex min-h-screen flex-col bg-muted/40">
+    <div className="flex flex-col bg-muted/40">
        <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
           <Button variant="outline" size="sm" asChild>
             <Link href="/admin/dashboard">
@@ -96,21 +112,42 @@ export default function SiteSettingsPage() {
                     </div>
                 ) : (
                     <>
-                        <div className="space-y-2">
-                            <Label htmlFor="name">Name</Label>
-                            <Input id="name" value={name} onChange={e => setName(e.target.value)} />
+                        <h3 className="text-lg font-medium text-foreground font-headline">About Me Section</h3>
+                        <div className="space-y-4 rounded-lg border p-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="name">Name</Label>
+                                <Input id="name" value={name} onChange={e => setName(e.target.value)} />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="imageUrl">Image URL</Label>
+                                <Input id="imageUrl" value={imageUrl} onChange={e => setImageUrl(e.target.value)} />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="bio">Bio / Subtitle</Label>
+                                <Input id="bio" value={bio} onChange={e => setBio(e.target.value)} />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="aboutContent">About Page Content</Label>
+                                <Textarea id="aboutContent" value={content} onChange={e => setContent(e.target.value)} className="min-h-40" />
+                            </div>
                         </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="imageUrl">Image URL</Label>
-                            <Input id="imageUrl" value={imageUrl} onChange={e => setImageUrl(e.target.value)} />
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="bio">Bio / Subtitle</Label>
-                            <Input id="bio" value={bio} onChange={e => setBio(e.target.value)} />
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="aboutContent">About Page Content</Label>
-                            <Textarea id="aboutContent" value={content} onChange={e => setContent(e.target.value)} className="min-h-40" />
+
+                        <Separator />
+
+                        <h3 className="text-lg font-medium text-foreground font-headline">Follow Me Section</h3>
+                        <div className="space-y-4 rounded-lg border p-4">
+                             <div className="space-y-2">
+                                <Label htmlFor="twitterUrl">Twitter / X URL</Label>
+                                <Input id="twitterUrl" value={twitterUrl} onChange={e => setTwitterUrl(e.target.value)} placeholder="https://twitter.com/your-profile"/>
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="githubUrl">GitHub URL</Label>
+                                <Input id="githubUrl" value={githubUrl} onChange={e => setGithubUrl(e.target.value)} placeholder="https://github.com/your-username"/>
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="linkedinUrl">LinkedIn URL</Label>
+                                <Input id="linkedinUrl" value={linkedinUrl} onChange={e => setLinkedinUrl(e.target.value)} placeholder="https://linkedin.com/in/your-profile"/>
+                            </div>
                         </div>
                     </>
                 )}
