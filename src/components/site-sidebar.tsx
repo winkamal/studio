@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -52,13 +53,13 @@ export function SiteSidebar() {
           <Avatar>
             <AvatarImage
               src="https://picsum.photos/seed/author/100/100"
-              alt="Alex Doe"
+              alt="Vibha"
               data-ai-hint="person portrait"
             />
-            <AvatarFallback>AD</AvatarFallback>
+            <AvatarFallback>V</AvatarFallback>
           </Avatar>
           <div className="flex flex-col">
-            <span className="font-semibold text-lg">Alex Doe</span>
+            <span className="font-semibold text-lg">Vibha</span>
             <span className="text-sm text-muted-foreground">Author & Dreamer</span>
           </div>
         </div>

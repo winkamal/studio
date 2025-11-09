@@ -31,16 +31,16 @@ export default function AboutPage() {
                   <div className="relative w-48 h-48 rounded-full overflow-hidden shadow-lg flex-shrink-0">
                     <Image
                       src="https://picsum.photos/seed/aboutme/400/400"
-                      alt="Alex Doe"
+                      alt="Vibha"
                       fill
                       className="object-cover"
                       data-ai-hint="person smiling"
                     />
                   </div>
                   <div>
-                      <h2 className="font-headline text-3xl font-bold mb-2">Alex Doe</h2>
+                      <h2 className="font-headline text-3xl font-bold mb-2">Vibha</h2>
                       <p className="text-lg text-muted-foreground mb-4">
-                          Hi there! I'm Alex, the voice and heart behind Life Canvas. I started this blog as a personal project to document the small, everyday moments that often go unnoticed but hold the most meaning.
+                          Hi there! I'm Vibha, the voice and heart behind Life Canvas. I started this blog as a personal project to document the small, everyday moments that often go unnoticed but hold the most meaning.
                       </p>
                   </div>
                 </div>
