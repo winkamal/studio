@@ -90,21 +90,29 @@ function PostPageContent({ post }: { post: BlogPost }) {
 
 function PostPageSkeleton() {
     return (
-        <main className="container mx-auto px-4 py-8">
-          <Skeleton className="h-96 w-full mb-8" />
-          <div className="max-w-3xl mx-auto">
-            <Skeleton className="h-12 w-3/4 mb-4" />
-            <div className="flex items-center gap-4">
-              <Skeleton className="h-12 w-12 rounded-full" />
-              <div className="space-y-2">
-                <Skeleton className="h-4 w-24" />
-                <Skeleton className="h-4 w-32" />
+        <main className="py-8">
+          <div className="container mx-auto px-4">
+            <Skeleton className="h-96 w-full mb-8" />
+            <div className="max-w-3xl mx-auto">
+                <div className="flex gap-2 mb-4">
+                    <Skeleton className="h-6 w-20" />
+                    <Skeleton className="h-6 w-24" />
+                </div>
+              <Skeleton className="h-12 w-3/4 mb-4" />
+              <div className="flex items-center gap-4 mb-8">
+                <Skeleton className="h-12 w-12 rounded-full" />
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-24" />
+                  <Skeleton className="h-4 w-32" />
+                </div>
               </div>
-            </div>
-            <div className="mt-8 space-y-4">
-              <Skeleton className="h-6 w-full" />
-              <Skeleton className="h-6 w-full" />
-              <Skeleton className="h-6 w-5/6" />
+              <div className="space-y-4">
+                <Skeleton className="h-6 w-full" />
+                <Skeleton className="h-6 w-full" />
+                <Skeleton className="h-6 w-5/6" />
+                 <Skeleton className="h-6 w-full mt-4" />
+                <Skeleton className="h-6 w-3/4" />
+              </div>
             </div>
           </div>
         </main>
@@ -123,15 +131,16 @@ export default function PostPage() {
   
   const { data: posts, isLoading } = useCollection<BlogPost>(postQuery);
 
-  const post = posts?.[0];
+  const post = useMemo(() => posts?.[0], [posts]);
 
+  // The 404 is triggered if loading is complete AND there is still no post.
   if (!isLoading && !post) {
     notFound();
   }
 
   return (
     <SidebarProvider>
-      <div className="relative flex flex-col">
+      <div className="relative flex min-h-screen flex-col">
         <SiteHeader />
         <div className="flex-1">
           <Sidebar>
