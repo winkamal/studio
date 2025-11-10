@@ -61,7 +61,7 @@ function PostPageContent({ post }: { post: BlogPost }) {
     <main className="py-8">
       <article>
         <header className="container mx-auto px-4 mb-8">
-          <div className="relative h-64 md:h-96 w-full mb-8 rounded-lg overflow-hidden shadow-lg">
+          <div className="relative h-64 md:h-96 w-full mb-8 rounded-lg overflow-hidden shadow-lg max-w-5xl mx-auto">
             <Image
               src={post.coverImage}
               alt={post.title}
