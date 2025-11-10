@@ -81,7 +81,7 @@ export default function SiteSettingsPage() {
             setHeroSubtitle(aboutContent.heroSubtitle || '');
         }
         if (user?.email) {
-            setUsername(user.email);
+            setUsername(user.email.split('@')[0]);
         }
     }, [aboutContent, user]);
 
@@ -143,8 +143,9 @@ export default function SiteSettingsPage() {
         setIsSaving(true);
         
         try {
-            if (user && user.email !== username) {
-                await updateEmail(user, username);
+            const newEmail = username.includes('@') ? username : `${username}@example.com`;
+            if (user && user.email !== newEmail) {
+                await updateEmail(user, newEmail);
                 toast({ title: 'Username Updated', description: 'Your admin username has been changed.' });
             }
 
@@ -295,8 +296,9 @@ export default function SiteSettingsPage() {
                          <h3 className="text-lg font-medium text-foreground font-headline">Admin Account</h3>
                         <div className="space-y-4 rounded-lg border p-4">
                             <div className="space-y-2">
-                                <Label htmlFor="username">Admin Username (Email)</Label>
-                                <Input id="username" type="email" value={username} onChange={e => setUsername(e.target.value)} />
+                                <Label htmlFor="username">Admin Username</Label>
+                                <Input id="username" value={username} onChange={e => setUsername(e.target.value)} />
+                                <p className="text-xs text-muted-foreground">This will also change your login email.</p>
                             </div>
                             <form onSubmit={handlePasswordUpdate} className="space-y-4">
                                 <div className="space-y-2">

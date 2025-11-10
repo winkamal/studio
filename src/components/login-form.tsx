@@ -25,7 +25,7 @@ import { useAuth } from "@/firebase";
 
 
 const formSchema = z.object({
-  email: z.string().email({ message: "Please enter a valid email." }),
+  email: z.string().min(1, { message: "Please enter a username." }),
   password: z.string().min(6, { message: "Password must be at least 6 characters." }),
 });
 
@@ -38,16 +38,21 @@ export function LoginForm() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: "admin@example.com",
+      email: "admin",
       password: "testaccount",
     },
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
+    
+    // Automatically append @example.com if it's not an email
+    const email = values.email.includes('@') ? values.email : `${values.email}@example.com`;
+    const isDefaultAdmin = email === 'admin@example.com';
+
     try {
       // First, try to sign in
-      await signInWithEmailAndPassword(auth, values.email, values.password);
+      await signInWithEmailAndPassword(auth, email, values.password);
       toast({
         title: "Login Successful",
         description: "Redirecting to dashboard...",
@@ -57,9 +62,9 @@ export function LoginForm() {
         // If sign-in fails, check if it's because the user doesn't exist
         if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
             try {
-                // Attempt to create the user if it's the default admin email
-                if (values.email === "admin@example.com") {
-                    await createUserWithEmailAndPassword(auth, values.email, values.password);
+                // Attempt to create the user if it's the default admin
+                if (isDefaultAdmin) {
+                    await createUserWithEmailAndPassword(auth, email, values.password);
                     toast({
                         title: "Admin Account Created",
                         description: "Redirecting to dashboard...",
@@ -105,9 +110,9 @@ export function LoginForm() {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Username (Email)</FormLabel>
+                  <FormLabel>Username</FormLabel>
                   <FormControl>
-                    <Input placeholder="admin@example.com" {...field} />
+                    <Input placeholder="admin" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

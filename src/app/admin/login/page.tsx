@@ -12,7 +12,7 @@ export default function AdminLoginPage() {
             VT blogs
           </h1>
           <p className="text-sm text-muted-foreground text-center">
-            Enter your admin credentials. The default username is admin@example.com and the password is "testaccount". If the admin account doesn't exist, it will be created on first login.
+            Enter your admin credentials. The default username is "admin" and the password is "testaccount". If the admin account doesn't exist, it will be created on first login.
           </p>
         </div>
         <LoginForm />
