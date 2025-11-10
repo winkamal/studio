@@ -25,13 +25,9 @@ import { useAuth } from "@/firebase";
 
 
 const formSchema = z.object({
-  username: z.literal("admin", {
-    errorMap: () => ({ message: "Username must be 'admin'." }),
-  }),
+  email: z.string().email({ message: "Please enter a valid email." }),
   password: z.string().min(6, { message: "Password must be at least 6 characters." }),
 });
-
-const ADMIN_EMAIL = "admin@example.com";
 
 export function LoginForm() {
   const router = useRouter();
@@ -42,7 +38,7 @@ export function LoginForm() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      username: "admin",
+      email: "admin@example.com",
       password: "",
     },
   });
@@ -51,7 +47,7 @@ export function LoginForm() {
     setIsLoading(true);
     try {
       // First, try to sign in
-      await signInWithEmailAndPassword(auth, ADMIN_EMAIL, values.password);
+      await signInWithEmailAndPassword(auth, values.email, values.password);
       toast({
         title: "Login Successful",
         description: "Redirecting to dashboard...",
@@ -61,20 +57,27 @@ export function LoginForm() {
         // If sign-in fails, check if it's because the user doesn't exist
         if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
             try {
-                // Attempt to create the user
-                await createUserWithEmailAndPassword(auth, ADMIN_EMAIL, values.password);
-                toast({
-                    title: "Admin Account Created",
-                    description: "Redirecting to dashboard...",
-                });
-                router.push("/admin/dashboard");
+                // Attempt to create the user if it's the default admin email
+                if (values.email === "admin@example.com") {
+                    await createUserWithEmailAndPassword(auth, values.email, values.password);
+                    toast({
+                        title: "Admin Account Created",
+                        description: "Redirecting to dashboard...",
+                    });
+                    router.push("/admin/dashboard");
+                } else {
+                     toast({
+                        variant: "destructive",
+                        title: "Login Failed",
+                        description: "Invalid credentials. Please try again.",
+                    });
+                }
             } catch (creationError: any) {
                  toast({
                     variant: "destructive",
                     title: "Login Failed",
                     description: creationError.message || "An unexpected error occurred during sign-up.",
                 });
-                setIsLoading(false);
             }
         } else {
             // Handle other login errors
@@ -83,8 +86,9 @@ export function LoginForm() {
                 title: "Login Failed",
                 description: error.message || "Invalid credentials. Please try again.",
             });
-            setIsLoading(false);
         }
+    } finally {
+        setIsLoading(false);
     }
   }
 
@@ -98,12 +102,12 @@ export function LoginForm() {
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <FormField
               control={form.control}
-              name="username"
+              name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Username</FormLabel>
+                  <FormLabel>Username (Email)</FormLabel>
                   <FormControl>
-                    <Input placeholder="admin" {...field} readOnly />
+                    <Input placeholder="admin@example.com" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -132,3 +136,5 @@ export function LoginForm() {
     </Card>
   );
 }
+
+    

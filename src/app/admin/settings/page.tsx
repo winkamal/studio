@@ -19,7 +19,7 @@ import { Separator } from "@/components/ui/separator";
 import { hexToHsl, hslToHex } from "@/lib/utils";
 import Image from "next/image";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { updatePassword } from "firebase/auth";
+import { updatePassword, updateEmail } from "firebase/auth";
 
 export default function SiteSettingsPage() {
     const firestore = useFirestore();
@@ -44,6 +44,7 @@ export default function SiteSettingsPage() {
     const [gradientColor3, setGradientColor3] = useState('');
     const [gradientColor4, setGradientColor4] = useState('');
 
+    const [username, setUsername] = useState('admin@example.com');
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     
@@ -53,6 +54,7 @@ export default function SiteSettingsPage() {
 
 
     const [isSaving, setIsSaving] = useState(false);
+    const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
     const { toast } = useToast();
     const fileInputRef = useRef<HTMLInputElement>(null);
     const heroImageInputRef = useRef<HTMLInputElement>(null);
@@ -61,7 +63,7 @@ export default function SiteSettingsPage() {
         if (aboutContent) {
             setName(aboutContent.name || '');
             setBio(aboutContent.bio || '');
-setContent(aboutContent.content || '');
+            setContent(aboutContent.content || '');
             setImageUrl(aboutContent.imageUrl || '');
             setTwitterUrl(aboutContent.twitterUrl || '');
             setGithubUrl(aboutContent.githubUrl || '');
@@ -78,7 +80,10 @@ setContent(aboutContent.content || '');
             setHeroTitle(aboutContent.heroTitle || '');
             setHeroSubtitle(aboutContent.heroSubtitle || '');
         }
-    }, [aboutContent]);
+        if (user?.email) {
+            setUsername(user.email);
+        }
+    }, [aboutContent, user]);
 
     const handleImageUpload = (e: ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -101,41 +106,48 @@ setContent(aboutContent.content || '');
             reader.readAsDataURL(file);
         }
     };
-
-    const handleSave = async (e: FormEvent) => {
+    
+    const handlePasswordUpdate = async (e: FormEvent) => {
         e.preventDefault();
+        if (!user || !newPassword) {
+            toast({ variant: 'destructive', title: 'Error', description: 'Please enter a new password.' });
+            return;
+        }
+        if (newPassword !== confirmPassword) {
+            toast({ variant: 'destructive', title: 'Error', description: 'Passwords do not match.' });
+            return;
+        }
+        if (newPassword.length < 6) {
+            toast({ variant: 'destructive', title: 'Error', description: 'Password must be at least 6 characters long.' });
+            return;
+        }
+
+        setIsUpdatingPassword(true);
+        try {
+            await updatePassword(user, newPassword);
+            toast({ title: 'Password Updated', description: 'Your admin password has been changed.' });
+            setNewPassword('');
+            setConfirmPassword('');
+        } catch (error: any) {
+            console.error(error);
+            toast({ variant: 'destructive', title: 'Password Update Failed', description: error.message || 'Could not update password.' });
+        } finally {
+            setIsUpdatingPassword(false);
+        }
+    };
+    
+    const handleSaveSettings = async (e: FormEvent) => {
+        e.preventDefault();
+        if (!aboutRef) return;
         
         setIsSaving(true);
         
-        // Handle password update
-        if (newPassword) {
-            if (newPassword !== confirmPassword) {
-                toast({ variant: "destructive", title: "Error", description: "Passwords do not match." });
-                setIsSaving(false);
-                return;
+        try {
+            if (user && user.email !== username) {
+                await updateEmail(user, username);
+                toast({ title: 'Username Updated', description: 'Your admin username has been changed.' });
             }
-            if (newPassword.length < 6) {
-                toast({ variant: "destructive", title: "Error", description: "Password must be at least 6 characters long." });
-                setIsSaving(false);
-                return;
-            }
-            if (user) {
-                try {
-                    await updatePassword(user, newPassword);
-                    toast({ title: "Password Updated", description: "Your admin password has been changed." });
-                    setNewPassword('');
-                    setConfirmPassword('');
-                } catch (error: any) {
-                    console.error(error);
-                    toast({ variant: "destructive", title: "Password Update Failed", description: error.message || "Could not update password." });
-                    setIsSaving(false);
-                    return;
-                }
-            }
-        }
-        
-        // Handle other settings
-        if (aboutRef) {
+
             const updatedContent: Partial<AboutContent> = { 
                 name, 
                 bio, 
@@ -155,23 +167,21 @@ setContent(aboutContent.content || '');
                 heroSubtitle,
             };
             
-            try {
-                await setDocumentNonBlocking(aboutRef, updatedContent, { merge: true });
-                toast({
-                    title: "Settings Saved",
-                    description: "Your site settings have been updated.",
-                });
-            } catch (error) {
-                console.error(error);
-                toast({
-                    variant: "destructive",
-                    title: "Error",
-                    description: "Could not save settings.",
-                });
-            }
+            await setDocumentNonBlocking(aboutRef, updatedContent, { merge: true });
+            toast({
+                title: "Settings Saved",
+                description: "Your site settings have been updated.",
+            });
+        } catch (error: any) {
+            console.error(error);
+            toast({
+                variant: "destructive",
+                title: "Error",
+                description: error.message || "Could not save settings.",
+            });
+        } finally {
+            setIsSaving(false);
         }
-
-        setIsSaving(false);
     }
 
   return (
@@ -185,7 +195,7 @@ setContent(aboutContent.content || '');
           </Button>
       </header>
       <main className="flex-1 p-4 sm:px-6 sm:py-0">
-        <form onSubmit={handleSave}>
+        <form onSubmit={handleSaveSettings}>
             <Card>
             <CardHeader>
                 <CardTitle className="font-headline">Site Settings</CardTitle>
@@ -285,18 +295,23 @@ setContent(aboutContent.content || '');
                          <h3 className="text-lg font-medium text-foreground font-headline">Admin Account</h3>
                         <div className="space-y-4 rounded-lg border p-4">
                             <div className="space-y-2">
-                                <Label htmlFor="username">Username</Label>
-                                <Input id="username" value="admin" readOnly disabled />
-                                <p className="text-xs text-muted-foreground">The admin username cannot be changed.</p>
+                                <Label htmlFor="username">Admin Username (Email)</Label>
+                                <Input id="username" type="email" value={username} onChange={e => setUsername(e.target.value)} />
                             </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="newPassword">New Password</Label>
-                                <Input id="newPassword" type="password" value={newPassword} onChange={e => setNewPassword(e.target.value)} placeholder="Leave blank to keep current password" />
-                            </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="confirmPassword">Confirm New Password</Label>
-                                <Input id="confirmPassword" type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} />
-                            </div>
+                            <form onSubmit={handlePasswordUpdate} className="space-y-4">
+                                <div className="space-y-2">
+                                    <Label htmlFor="newPassword">New Password</Label>
+                                    <Input id="newPassword" type="password" value={newPassword} onChange={e => setNewPassword(e.target.value)} placeholder="Leave blank to keep current password" />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="confirmPassword">Confirm New Password</Label>
+                                    <Input id="confirmPassword" type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} />
+                                </div>
+                                <Button type="submit" variant="secondary" disabled={isUpdatingPassword || !newPassword}>
+                                    {isUpdatingPassword && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                    Update Password
+                                </Button>
+                            </form>
                         </div>
 
                         <Separator />
@@ -410,7 +425,7 @@ setContent(aboutContent.content || '');
                 <div className="flex justify-end mt-6">
                 <Button type="submit" disabled={isSaving}>
                     {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    Save All Changes
+                    Save Settings
                 </Button>
                 </div>
             </CardContent>

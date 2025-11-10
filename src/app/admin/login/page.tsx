@@ -12,7 +12,7 @@ export default function AdminLoginPage() {
             VT blogs
           </h1>
           <p className="text-sm text-muted-foreground text-center">
-            Admin Login. Enter 'admin' and a password of at least 6 characters. If the account doesn't exist, it will be created.
+            Admin Login. Enter your admin email and a password of at least 6 characters. If the default admin account doesn't exist, it will be created.
           </p>
         </div>
         <LoginForm />
@@ -20,3 +20,5 @@ export default function AdminLoginPage() {
     </div>
   );
 }
+
+    
