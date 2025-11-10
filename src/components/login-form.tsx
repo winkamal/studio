@@ -39,7 +39,7 @@ export function LoginForm() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: "admin@example.com",
-      password: "",
+      password: "testaccount",
     },
   });
 
@@ -136,5 +136,3 @@ export function LoginForm() {
     </Card>
   );
 }
-
-    

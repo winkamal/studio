@@ -44,7 +44,7 @@ export default function SiteSettingsPage() {
     const [gradientColor3, setGradientColor3] = useState('');
     const [gradientColor4, setGradientColor4] = useState('');
 
-    const [username, setUsername] = useState('admin@example.com');
+    const [username, setUsername] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     
@@ -435,5 +435,3 @@ export default function SiteSettingsPage() {
     </div>
   );
 }
-
-    
