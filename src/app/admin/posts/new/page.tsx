@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,20 +7,23 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
-import { ArrowLeft, Loader2 } from "lucide-react";
-import { useState, type FormEvent } from "react";
+import { ArrowLeft, Loader2, Upload } from "lucide-react";
+import { useState, type FormEvent, useRef, type ChangeEvent } from "react";
 import { useFirestore, useUser } from "@/firebase";
 import { collection } from "firebase/firestore";
 import { addDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 export default function NewPostPage() {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [tags, setTags] = useState('');
+  const [coverImage, setCoverImage] = useState<string | null>(null);
   const [isLoading, setIsLoading] =useState(false);
 
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const firestore = useFirestore();
   const { user } = useUser();
   const { toast } = useToast();
@@ -34,6 +36,17 @@ export default function NewPostPage() {
       .trim()
       .replace(/\s+/g, '-')
       .replace(/-+/g, '-');
+  };
+
+  const handleImageUpload = (e: ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (file) {
+          const reader = new FileReader();
+          reader.onloadend = () => {
+              setCoverImage(reader.result as string);
+          };
+          reader.readAsDataURL(file);
+      }
   };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -56,8 +69,8 @@ export default function NewPostPage() {
         slug,
         author: "Vibha",
         date: new Date().toISOString(),
-        tags: tags.split(',').map(tag => tag.trim().toLowerCase()),
-        coverImage: `https://picsum.photos/seed/${slug}/1080/720`,
+        tags: tags.split(',').map(tag => tag.trim().toLowerCase()).filter(tag => tag),
+        coverImage: coverImage || `https://picsum.photos/seed/${slug}/1080/720`,
         coverImageHint: "blog post",
         excerpt: content.substring(0, 150) + "...",
     };
@@ -105,6 +118,28 @@ export default function NewPostPage() {
               <div className="space-y-2">
                 <Label htmlFor="title">Title</Label>
                 <Input id="title" placeholder="Your post title" value={title} onChange={(e) => setTitle(e.target.value)} required />
+              </div>
+              <div className="space-y-2">
+                <Label>Cover Image</Label>
+                <div className="flex items-center gap-4">
+                  {coverImage && (
+                    <div className="relative w-48 h-24 rounded-md overflow-hidden">
+                      <Image src={coverImage} alt="Cover image preview" fill className="object-cover" />
+                    </div>
+                  )}
+                  <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()}>
+                    <Upload className="mr-2 h-4 w-4" />
+                    {coverImage ? 'Change Image' : 'Upload Image'}
+                  </Button>
+                  <Input 
+                    type="file" 
+                    ref={fileInputRef} 
+                    className="hidden" 
+                    onChange={handleImageUpload}
+                    accept="image/*"
+                  />
+                </div>
+                <p className="text-xs text-muted-foreground">Optional. If not provided, an image will be auto-generated.</p>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="content">Content</Label>

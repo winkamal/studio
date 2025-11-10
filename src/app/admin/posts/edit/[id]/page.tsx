@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,8 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
-import { ArrowLeft, Loader2 } from "lucide-react";
-import { useState, type FormEvent, useEffect } from "react";
+import { ArrowLeft, Loader2, Upload } from "lucide-react";
+import { useState, type FormEvent, useEffect, useRef, type ChangeEvent } from "react";
 import { useDoc, useFirestore, useMemoFirebase, useUser } from "@/firebase";
 import { doc } from "firebase/firestore";
 import { updateDocumentNonBlocking } from "@/firebase/non-blocking-updates";
@@ -15,16 +16,19 @@ import { useToast } from "@/hooks/use-toast";
 import { useRouter, useParams } from "next/navigation";
 import { BlogPost } from "@/types";
 import { Skeleton } from "@/components/ui/skeleton";
+import Image from "next/image";
 
 export default function EditPostPage() {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [tags, setTags] = useState('');
+  const [coverImage, setCoverImage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   
   const router = useRouter();
   const params = useParams();
   const { id } = params;
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const firestore = useFirestore();
   const { user } = useUser();
@@ -38,8 +42,20 @@ export default function EditPostPage() {
       setTitle(post.title);
       setContent(post.content);
       setTags(post.tags.join(', '));
+      setCoverImage(post.coverImage);
     }
   }, [post]);
+
+  const handleImageUpload = (e: ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (file) {
+          const reader = new FileReader();
+          reader.onloadend = () => {
+              setCoverImage(reader.result as string);
+          };
+          reader.readAsDataURL(file);
+      }
+  };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -57,7 +73,8 @@ export default function EditPostPage() {
     const updatedPost = {
         title,
         content,
-        tags: tags.split(',').map(tag => tag.trim().toLowerCase()),
+        coverImage,
+        tags: tags.split(',').map(tag => tag.trim().toLowerCase()).filter(tag => tag),
         excerpt: content.substring(0, 150) + "...",
     };
 
@@ -106,6 +123,10 @@ export default function EditPostPage() {
                     <Skeleton className="h-10 w-full" />
                  </div>
                  <div className="space-y-2">
+                    <Skeleton className="h-4 w-24" />
+                    <Skeleton className="h-24 w-48" />
+                 </div>
+                 <div className="space-y-2">
                     <Skeleton className="h-4 w-16" />
                     <Skeleton className="h-40 w-full" />
                  </div>
@@ -141,6 +162,27 @@ export default function EditPostPage() {
               <div className="space-y-2">
                 <Label htmlFor="title">Title</Label>
                 <Input id="title" placeholder="Your post title" value={title} onChange={(e) => setTitle(e.target.value)} required />
+              </div>
+              <div className="space-y-2">
+                <Label>Cover Image</Label>
+                <div className="flex items-center gap-4">
+                  {coverImage && (
+                    <div className="relative w-48 h-24 rounded-md overflow-hidden">
+                      <Image src={coverImage} alt="Cover image preview" fill className="object-cover" />
+                    </div>
+                  )}
+                  <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()}>
+                    <Upload className="mr-2 h-4 w-4" />
+                    Change Image
+                  </Button>
+                  <Input 
+                    type="file" 
+                    ref={fileInputRef} 
+                    className="hidden" 
+                    onChange={handleImageUpload}
+                    accept="image/*"
+                  />
+                </div>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="content">Content</Label>
