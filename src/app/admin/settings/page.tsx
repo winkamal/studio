@@ -286,7 +286,7 @@ export default function SiteSettingsPage() {
                                 <Input id="bio" value={bio} onChange={e => setBio(e.target.value)} />
                             </div>
                             <div className="space-y-2">
-                                <Label htmlFor="aboutContent">About Page Content</Label>
+                                <Label htmlFor="aboutContent">About the Author</Label>
                                 <Textarea id="aboutContent" value={content} onChange={e => setContent(e.target.value)} className="min-h-40" />
                             </div>
                         </div>
