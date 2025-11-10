@@ -87,6 +87,21 @@
         "heroSubtitle": { "type": "string" }
       },
       "required": ["id", "name", "imageUrl", "bio", "content"]
+    },
+    "Feedback": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Feedback",
+      "type": "object",
+      "description": "Represents a bug report or feature request.",
+      "properties": {
+        "id": { "type": "string" },
+        "type": { "type": "string", "enum": ["bug", "feature"] },
+        "description": { "type": "string" },
+        "status": { "type": "string", "enum": ["New", "In Progress", "Completed"] },
+        "comment": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "type", "description", "status", "createdAt"]
     }
   },
   "auth": {
@@ -121,6 +136,16 @@
                 "$ref": "#/entities/AboutContent"
             },
             "description": "Stores the content for the about page."
+        }
+      },
+      {
+        "path": "/feedback/{feedbackId}",
+        "definition": {
+          "entityName": "Feedback",
+          "schema": {
+            "$ref": "#/entities/Feedback"
+          },
+          "description": "Stores bug reports and feature requests."
         }
       }
     ]

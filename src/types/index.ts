@@ -43,3 +43,12 @@ export type AboutContent = {
     heroTitle?: string;
     heroSubtitle?: string;
 };
+
+export type Feedback = {
+  id: string;
+  type: 'bug' | 'feature';
+  description: string;
+  status: 'New' | 'In Progress' | 'Completed';
+  comment: string;
+  createdAt: string;
+}

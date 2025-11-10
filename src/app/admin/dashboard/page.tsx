@@ -1,7 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { PlusCircle, Edit, Settings, LogOut, Home } from "lucide-react";
+import { PlusCircle, Edit, Settings, LogOut, Home, MessageSquarePlus } from "lucide-react";
 import Link from "next/link";
 
 export default function AdminDashboardPage() {
@@ -54,6 +54,23 @@ export default function AdminDashboardPage() {
             <CardContent>
               <Button className="w-full" asChild>
                 <Link href="/admin/posts">View All Posts</Link>
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card className="hover:shadow-lg transition-shadow">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 font-headline">
+                <MessageSquarePlus className="h-6 w-6 text-primary" />
+                Feedback & Bugs
+              </CardTitle>
+              <CardDescription>
+                View and manage user feedback and bug reports.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button className="w-full" asChild>
+                <Link href="/admin/feedback">Manage Feedback</Link>
               </Button>
             </CardContent>
           </Card>
