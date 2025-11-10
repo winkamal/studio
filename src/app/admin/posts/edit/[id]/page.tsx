@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import { useState, type FormEvent, useEffect } from "react";
-import { useDoc, useFirestore, useUser } from "@/firebase";
+import { useDoc, useFirestore, useMemoFirebase, useUser } from "@/firebase";
 import { doc } from "firebase/firestore";
 import { updateDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 import { useToast } from "@/hooks/use-toast";
@@ -30,7 +30,7 @@ export default function EditPostPage() {
   const { user } = useUser();
   const { toast } = useToast();
   
-  const postRef = doc(firestore, 'blogs', id as string);
+  const postRef = useMemoFirebase(() => (firestore && id ? doc(firestore, 'blogs', id as string) : null), [firestore, id]);
   const { data: post, isLoading: isPostLoading } = useDoc<BlogPost>(postRef);
 
   useEffect(() => {
@@ -43,7 +43,7 @@ export default function EditPostPage() {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!firestore || !user) {
+    if (!firestore || !user || !postRef) {
         toast({
             variant: "destructive",
             title: "Error",
