@@ -1,10 +1,25 @@
 
+'use client';
+
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { PlusCircle, Edit, Settings, LogOut, Home, MessageSquarePlus } from "lucide-react";
+import { useCollection, useFirestore, useMemoFirebase } from "@/firebase";
+import { Feedback } from "@/types";
+import { collection, query, where }from "firebase/firestore";
+import { PlusCircle, Edit, Settings, LogOut, Home, MessageSquarePlus, Loader2 } from "lucide-react";
 import Link from "next/link";
 
 export default function AdminDashboardPage() {
+  const firestore = useFirestore();
+  const openFeedbackQuery = useMemoFirebase(
+    () => firestore ? query(collection(firestore, 'feedback'), where('status', '!=', 'Completed')) : null,
+    [firestore]
+  );
+  const { data: openFeedbackItems, isLoading } = useCollection<Feedback>(openFeedbackQuery);
+  
+  const openFeedbackCount = openFeedbackItems?.length ?? 0;
+
   return (
     <div className="flex min-h-screen flex-col bg-muted/40">
       <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
@@ -63,6 +78,11 @@ export default function AdminDashboardPage() {
               <CardTitle className="flex items-center gap-2 font-headline">
                 <MessageSquarePlus className="h-6 w-6 text-primary" />
                 Feedback & Bugs
+                {isLoading ? (
+                    <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                ) : (
+                    openFeedbackCount > 0 && <Badge variant="destructive">{openFeedbackCount}</Badge>
+                )}
               </CardTitle>
               <CardDescription>
                 View and manage user feedback and bug reports.
