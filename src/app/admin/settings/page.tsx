@@ -300,7 +300,7 @@ export default function SiteSettingsPage() {
                                 <Input id="username" value={username} onChange={e => setUsername(e.target.value)} />
                                 <p className="text-xs text-muted-foreground">This will also change your login email.</p>
                             </div>
-                            <form onSubmit={handlePasswordUpdate} className="space-y-4">
+                            <div className="space-y-4">
                                 <div className="space-y-2">
                                     <Label htmlFor="newPassword">New Password</Label>
                                     <Input id="newPassword" type="password" value={newPassword} onChange={e => setNewPassword(e.target.value)} placeholder="Leave blank to keep current password" />
@@ -309,11 +309,11 @@ export default function SiteSettingsPage() {
                                     <Label htmlFor="confirmPassword">Confirm New Password</Label>
                                     <Input id="confirmPassword" type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} />
                                 </div>
-                                <Button type="submit" variant="secondary" disabled={isUpdatingPassword || !newPassword}>
+                                <Button onClick={handlePasswordUpdate} type="button" variant="secondary" disabled={isUpdatingPassword || !newPassword}>
                                     {isUpdatingPassword && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                                     Update Password
                                 </Button>
-                            </form>
+                            </div>
                         </div>
 
                         <Separator />
