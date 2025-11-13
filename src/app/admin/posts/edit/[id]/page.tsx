@@ -10,8 +10,7 @@ import Link from "next/link";
 import { ArrowLeft, Loader2, Trash2, Upload } from "lucide-react";
 import { useState, type FormEvent, useEffect, useRef, type ChangeEvent } from "react";
 import { useDoc, useFirestore, useMemoFirebase, useUser } from "@/firebase";
-import { doc } from "firebase/firestore";
-import { updateDocumentNonBlocking } from "@/firebase/non-blocking-updates";
+import { doc, updateDoc } from "firebase/firestore";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter, useParams } from "next/navigation";
 import { BlogPost } from "@/types";
@@ -91,7 +90,7 @@ export default function EditPostPage() {
     };
 
     try {
-        updateDocumentNonBlocking(postRef, updatedPost);
+        await updateDoc(postRef, updatedPost);
         
         toast({
             title: "Post Updated!",
