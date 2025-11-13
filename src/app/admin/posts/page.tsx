@@ -123,7 +123,7 @@ export default function ManagePostsPage() {
                           <Badge variant={'default'}>Published</Badge>
                         </TableCell>
                         <TableCell>
-                          {format(new Date(post.date), 'yyyy-MM-dd')}
+                          {format(new Date(post.date), 'yyyy-MM-dd HH:mm')}
                         </TableCell>
                         <TableCell className="text-right">
                            <Button variant="ghost" size="icon" asChild>
