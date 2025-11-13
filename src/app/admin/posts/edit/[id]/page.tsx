@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
-import { ArrowLeft, Loader2, Upload } from "lucide-react";
+import { ArrowLeft, Loader2, Trash2, Upload } from "lucide-react";
 import { useState, type FormEvent, useEffect, useRef, type ChangeEvent } from "react";
 import { useDoc, useFirestore, useMemoFirebase, useUser } from "@/firebase";
 import { doc } from "firebase/firestore";
@@ -46,6 +46,15 @@ export default function EditPostPage() {
     }
   }, [post]);
 
+  const generateSlug = (title: string) => {
+    return title
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, '')
+      .trim()
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-');
+  };
+
   const handleImageUpload = (e: ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
       if (file) {
@@ -70,10 +79,13 @@ export default function EditPostPage() {
     
     setIsLoading(true);
 
+    const slug = post?.slug || generateSlug(title);
+    const finalCoverImage = coverImage || `https://picsum.photos/seed/${slug}/1200/800`;
+
     const updatedPost = {
         title,
         content,
-        coverImage,
+        coverImage: finalCoverImage,
         tags: tags.split(',').map(tag => tag.trim().toLowerCase()).filter(tag => tag),
         excerpt: content.substring(0, 150) + "...",
     };
@@ -167,14 +179,22 @@ export default function EditPostPage() {
                 <Label>Cover Image</Label>
                 <div className="flex items-center gap-4">
                   {coverImage && (
-                    <div className="relative w-48 h-24 rounded-md overflow-hidden">
+                    <div className="relative w-48 h-24 rounded-md overflow-hidden border">
                       <Image src={coverImage} alt="Cover image preview" fill className="object-cover" />
                     </div>
                   )}
-                  <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()}>
-                    <Upload className="mr-2 h-4 w-4" />
-                    Change Image
-                  </Button>
+                  <div className="flex flex-col gap-2">
+                    <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()}>
+                        <Upload className="mr-2 h-4 w-4" />
+                        {coverImage ? 'Change Image' : 'Upload Image'}
+                    </Button>
+                    {coverImage && (
+                        <Button type="button" variant="destructive" size="sm" onClick={() => setCoverImage(null)}>
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Remove Image
+                        </Button>
+                    )}
+                  </div>
                   <Input 
                     type="file" 
                     ref={fileInputRef} 
@@ -183,6 +203,7 @@ export default function EditPostPage() {
                     accept="image/*"
                   />
                 </div>
+                <p className="text-xs text-muted-foreground">If no image is provided, a default placeholder will be used.</p>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="content">Content</Label>

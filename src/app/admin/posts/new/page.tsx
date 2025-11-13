@@ -123,7 +123,7 @@ export default function NewPostPage() {
                 <Label>Cover Image</Label>
                 <div className="flex items-center gap-4">
                   {coverImage && (
-                    <div className="relative w-48 h-24 rounded-md overflow-hidden">
+                    <div className="relative w-48 h-24 rounded-md overflow-hidden border">
                       <Image src={coverImage} alt="Cover image preview" fill className="object-cover" />
                     </div>
                   )}
