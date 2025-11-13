@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
-import { ArrowLeft, Loader2, Sparkles, Trash2, Upload } from "lucide-react";
+import { ArrowLeft, Loader2, Trash2, Upload } from "lucide-react";
 import { useState, type FormEvent, useEffect, useRef, type ChangeEvent } from "react";
 import { useDoc, useFirestore, useMemoFirebase, useUser } from "@/firebase";
 import { doc } from "firebase/firestore";
@@ -17,7 +17,6 @@ import { useRouter, useParams } from "next/navigation";
 import { BlogPost } from "@/types";
 import { Skeleton } from "@/components/ui/skeleton";
 import Image from "next/image";
-import { generateImage } from "@/ai/flows/generate-image-flow";
 
 export default function EditPostPage() {
   const [title, setTitle] = useState('');
@@ -25,7 +24,6 @@ export default function EditPostPage() {
   const [tags, setTags] = useState('');
   const [coverImage, setCoverImage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [isGeneratingImage, setIsGeneratingImage] = useState(false);
   
   const router = useRouter();
   const params = useParams();
@@ -67,35 +65,6 @@ export default function EditPostPage() {
           reader.readAsDataURL(file);
       }
   };
-
-  const handleGenerateImage = async () => {
-    if (!content) {
-        toast({
-            variant: "destructive",
-            title: "Cannot generate image",
-            description: "Please write some content for the post first.",
-        });
-        return;
-    }
-    setIsGeneratingImage(true);
-    try {
-        const result = await generateImage({ prompt: content });
-        setCoverImage(result.imageUrl);
-        toast({
-            title: "Image Generated!",
-            description: "A new cover image has been generated based on your post's content.",
-        });
-    } catch (error) {
-        console.error("Error generating image:", error);
-        toast({
-            variant: "destructive",
-            title: "Image Generation Failed",
-            description: "Could not generate an AI image. Please try again.",
-        });
-    } finally {
-        setIsGeneratingImage(false);
-    }
-  }
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -218,10 +187,6 @@ export default function EditPostPage() {
                     <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()}>
                         <Upload className="mr-2 h-4 w-4" />
                         {coverImage ? 'Change Image' : 'Upload Image'}
-                    </Button>
-                     <Button type="button" variant="secondary" onClick={handleGenerateImage} disabled={isGeneratingImage}>
-                        {isGeneratingImage ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
-                        Generate AI Image
                     </Button>
                     {coverImage && (
                         <Button type="button" variant="destructive" size="sm" onClick={() => setCoverImage(null)}>
