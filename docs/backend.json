@@ -99,7 +99,8 @@
         "description": { "type": "string" },
         "status": { "type": "string", "enum": ["New", "In Progress", "Completed"] },
         "comment": { "type": "string" },
-        "createdAt": { "type": "string", "format": "date-time" }
+        "createdAt": { "type": "string", "format": "date-time" },
+        "screenshotUrl": { "type": "string", "description": "URL of an uploaded screenshot." }
       },
       "required": ["id", "type", "description", "status", "createdAt"]
     }

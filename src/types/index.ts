@@ -51,4 +51,5 @@ export type Feedback = {
   status: 'New' | 'In Progress' | 'Completed';
   comment: string;
   createdAt: string;
+  screenshotUrl?: string;
 }

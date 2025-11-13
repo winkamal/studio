@@ -40,21 +40,36 @@ import {
 import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
 import { Feedback } from '@/types';
 import { collection, deleteDoc, doc, query, orderBy, addDoc, updateDoc } from 'firebase/firestore';
-import { ArrowLeft, Edit, Loader2, PlusCircle, Trash2 } from 'lucide-react';
+import { ArrowLeft, Edit, Loader2, PlusCircle, Trash2, Upload, Paperclip } from 'lucide-react';
 import Link from 'next/link';
-import { useState, type FormEvent } from 'react';
+import { useState, type FormEvent, useRef, type ChangeEvent } from 'react';
 import { format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
+import Image from 'next/image';
 
 function NewFeedbackForm({ onSubmitted }: { onSubmitted: () => void }) {
     const [description, setDescription] = useState('');
     const [type, setType] = useState<'bug' | 'feature'>('bug');
+    const [screenshotUrl, setScreenshotUrl] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const { toast } = useToast();
     const firestore = useFirestore();
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const handleScreenshotUpload = (e: ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setScreenshotUrl(reader.result as string);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
@@ -69,9 +84,11 @@ function NewFeedbackForm({ onSubmitted }: { onSubmitted: () => void }) {
                 status: 'New',
                 comment: '',
                 createdAt: new Date().toISOString(),
+                screenshotUrl,
             });
             toast({ title: 'Feedback Submitted', description: 'Thank you for your feedback!' });
             setDescription('');
+            setScreenshotUrl(null);
             onSubmitted();
         } catch (error) {
             console.error(error);
@@ -84,10 +101,6 @@ function NewFeedbackForm({ onSubmitted }: { onSubmitted: () => void }) {
     return (
         <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-                <Label htmlFor="description">Description</Label>
-                <Textarea id="description" value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Describe the bug or feature request..." required />
-            </div>
-            <div className="space-y-2">
                 <Label htmlFor="type">Type</Label>
                 <Select onValueChange={(value: 'bug' | 'feature') => setType(value)} defaultValue={type}>
                     <SelectTrigger id="type">
@@ -98,6 +111,29 @@ function NewFeedbackForm({ onSubmitted }: { onSubmitted: () => void }) {
                         <SelectItem value="feature">Feature Request</SelectItem>
                     </SelectContent>
                 </Select>
+            </div>
+            <div className="space-y-2">
+                <Label htmlFor="description">Description</Label>
+                <Textarea id="description" value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Describe the bug or feature request..." required />
+            </div>
+            <div className="space-y-2">
+                <Label>Screenshot</Label>
+                {screenshotUrl && (
+                    <div className="relative w-full aspect-video rounded-md overflow-hidden border">
+                         <Image src={screenshotUrl} alt="Screenshot preview" fill className="object-contain" />
+                    </div>
+                )}
+                <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()}>
+                    <Upload className="mr-2 h-4 w-4" />
+                    {screenshotUrl ? 'Change Screenshot' : 'Upload Screenshot'}
+                </Button>
+                <Input 
+                    type="file" 
+                    ref={fileInputRef} 
+                    className="hidden" 
+                    onChange={handleScreenshotUpload}
+                    accept="image/*"
+                />
             </div>
             <div className="flex justify-end">
                 <Button type="submit" disabled={isSubmitting}>
@@ -112,9 +148,22 @@ function NewFeedbackForm({ onSubmitted }: { onSubmitted: () => void }) {
 function EditFeedbackForm({ feedback, onSaved }: { feedback: Feedback; onSaved: () => void; }) {
     const [status, setStatus] = useState(feedback.status);
     const [comment, setComment] = useState(feedback.comment);
+    const [screenshotUrl, setScreenshotUrl] = useState(feedback.screenshotUrl || null);
     const [isSaving, setIsSaving] = useState(false);
     const { toast } = useToast();
     const firestore = useFirestore();
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const handleScreenshotUpload = (e: ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setScreenshotUrl(reader.result as string);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
 
     const handleSave = async (e: FormEvent) => {
         e.preventDefault();
@@ -123,7 +172,7 @@ function EditFeedbackForm({ feedback, onSaved }: { feedback: Feedback; onSaved: 
         setIsSaving(true);
         try {
             const feedbackRef = doc(firestore, 'feedback', feedback.id);
-            await updateDoc(feedbackRef, { status, comment });
+            await updateDoc(feedbackRef, { status, comment, screenshotUrl });
             toast({ title: 'Feedback Updated' });
             onSaved();
         } catch (error) {
@@ -156,6 +205,27 @@ function EditFeedbackForm({ feedback, onSaved }: { feedback: Feedback; onSaved: 
             <div className="space-y-2">
                 <Label htmlFor="comment">Developer Comment</Label>
                 <Textarea id="comment" value={comment} onChange={(e) => setComment(e.target.value)} placeholder="Add a comment..." />
+            </div>
+            <div className="space-y-2">
+                <Label>Screenshot</Label>
+                {screenshotUrl && (
+                    <div className="relative w-full aspect-video rounded-md overflow-hidden border">
+                         <a href={screenshotUrl} target="_blank" rel="noopener noreferrer">
+                            <Image src={screenshotUrl} alt="Screenshot preview" fill className="object-contain" />
+                         </a>
+                    </div>
+                )}
+                <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()}>
+                    <Upload className="mr-2 h-4 w-4" />
+                    {screenshotUrl ? 'Change Screenshot' : 'Upload Screenshot'}
+                </Button>
+                 <Input 
+                    type="file" 
+                    ref={fileInputRef} 
+                    className="hidden" 
+                    onChange={handleScreenshotUpload}
+                    accept="image/*"
+                />
             </div>
             <div className="flex justify-end">
                 <Button type="submit" disabled={isSaving}>
@@ -289,7 +359,10 @@ export default function ManageFeedbackPage() {
                         <TableCell>
                           <Badge variant={item.type === 'bug' ? 'destructive' : 'secondary'}>{item.type}</Badge>
                         </TableCell>
-                        <TableCell className="font-medium truncate max-w-sm">{item.description}</TableCell>
+                        <TableCell className="font-medium truncate max-w-sm flex items-center gap-2">
+                           {item.screenshotUrl && <Paperclip className="h-4 w-4 text-muted-foreground" />}
+                           {item.description}
+                        </TableCell>
                         <TableCell>
                           <Badge variant={getStatusBadgeVariant(item.status)}>{item.status}</Badge>
                         </TableCell>
@@ -352,7 +425,7 @@ export default function ManageFeedbackPage() {
 
       {itemToEdit && (
          <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
-            <DialogContent>
+            <DialogContent className="max-w-2xl">
                 <DialogHeader>
                     <DialogTitle>Update Feedback</DialogTitle>
                     <DialogDescription>
