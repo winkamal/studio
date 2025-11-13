@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
-import { ArrowLeft, Loader2, Upload } from "lucide-react";
+import { ArrowLeft, Loader2, Sparkles, Upload } from "lucide-react";
 import { useState, type FormEvent, useRef, type ChangeEvent } from "react";
 import { useFirestore, useUser } from "@/firebase";
 import { collection } from "firebase/firestore";
@@ -15,13 +15,15 @@ import { addDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { generateImage } from "@/ai/flows/generate-image-flow";
 
 export default function NewPostPage() {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [tags, setTags] = useState('');
   const [coverImage, setCoverImage] = useState<string | null>(null);
-  const [isLoading, setIsLoading] =useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isGeneratingImage, setIsGeneratingImage] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const firestore = useFirestore();
@@ -48,6 +50,35 @@ export default function NewPostPage() {
           reader.readAsDataURL(file);
       }
   };
+
+  const handleGenerateImage = async () => {
+    if (!content) {
+        toast({
+            variant: "destructive",
+            title: "Cannot generate image",
+            description: "Please write some content for the post first.",
+        });
+        return;
+    }
+    setIsGeneratingImage(true);
+    try {
+        const result = await generateImage({ prompt: content });
+        setCoverImage(result.imageUrl);
+        toast({
+            title: "Image Generated!",
+            description: "A new cover image has been generated based on your post's content.",
+        });
+    } catch (error) {
+        console.error("Error generating image:", error);
+        toast({
+            variant: "destructive",
+            title: "Image Generation Failed",
+            description: "Could not generate an AI image. Please try again.",
+        });
+    } finally {
+        setIsGeneratingImage(false);
+    }
+  }
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -127,10 +158,16 @@ export default function NewPostPage() {
                       <Image src={coverImage} alt="Cover image preview" fill className="object-cover" />
                     </div>
                   )}
-                  <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()}>
-                    <Upload className="mr-2 h-4 w-4" />
-                    {coverImage ? 'Change Image' : 'Upload Image'}
-                  </Button>
+                  <div className="flex flex-col gap-2">
+                    <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()}>
+                        <Upload className="mr-2 h-4 w-4" />
+                        {coverImage ? 'Change Image' : 'Upload Image'}
+                    </Button>
+                    <Button type="button" variant="secondary" onClick={handleGenerateImage} disabled={isGeneratingImage}>
+                        {isGeneratingImage ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
+                        Generate AI Image
+                    </Button>
+                  </div>
                   <Input 
                     type="file" 
                     ref={fileInputRef} 
@@ -139,7 +176,7 @@ export default function NewPostPage() {
                     accept="image/*"
                   />
                 </div>
-                <p className="text-xs text-muted-foreground">Optional. A default image will be used if none is uploaded.</p>
+                <p className="text-xs text-muted-foreground">Optional. A default image will be used if none is provided.</p>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="content">Content</Label>
@@ -152,7 +189,7 @@ export default function NewPostPage() {
               </div>
               <div className="flex justify-end gap-2">
                 <Button variant="outline" type="button" disabled={isLoading}>Save Draft</Button>
-                <Button type="submit" disabled={isLoading}>
+                <Button type="submit" disabled={isLoading || !title || !content}>
                     {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                     Publish Post
                 </Button>
