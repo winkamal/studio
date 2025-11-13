@@ -51,11 +51,11 @@ export default function NewPostPage() {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!firestore || !user || !coverImage) {
+    if (!firestore || !user) {
         toast({
             variant: "destructive",
             title: "Error",
-            description: "You must be logged in and upload a cover image to create a post.",
+            description: "You must be logged in to create a post.",
         });
         return;
     }
@@ -70,7 +70,7 @@ export default function NewPostPage() {
         author: "Vibha",
         date: new Date().toISOString(),
         tags: tags.split(',').map(tag => tag.trim().toLowerCase()).filter(tag => tag),
-        coverImage: coverImage,
+        coverImage: coverImage || `https://picsum.photos/seed/${slug}/1200/800`,
         coverImageHint: "blog post",
         excerpt: content.substring(0, 150) + "...",
     };
@@ -139,7 +139,7 @@ export default function NewPostPage() {
                     accept="image/*"
                   />
                 </div>
-                <p className="text-xs text-muted-foreground">A cover image is required.</p>
+                <p className="text-xs text-muted-foreground">Optional. A default image will be used if none is uploaded.</p>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="content">Content</Label>
@@ -152,7 +152,7 @@ export default function NewPostPage() {
               </div>
               <div className="flex justify-end gap-2">
                 <Button variant="outline" type="button" disabled={isLoading}>Save Draft</Button>
-                <Button type="submit" disabled={isLoading || !coverImage}>
+                <Button type="submit" disabled={isLoading}>
                     {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                     Publish Post
                 </Button>
