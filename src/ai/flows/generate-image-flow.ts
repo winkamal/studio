@@ -33,11 +33,14 @@ const generateImageFlow = ai.defineFlow(
   },
   async (input) => {
     const { media } = await ai.generate({
-      model: 'googleai/imagen-4.0-fast-generate-001',
+      model: 'googleai/gemini-2.5-flash-image-preview',
       prompt: `A beautiful, high-quality blog post cover image inspired by the following text: ${input.prompt}`,
+      config: {
+        responseModalities: ['IMAGE'],
+      },
     });
 
-    if (!media.url) {
+    if (!media?.url) {
       throw new Error('Image generation failed to return a URL.');
     }
 
