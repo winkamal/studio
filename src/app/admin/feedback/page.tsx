@@ -191,14 +191,15 @@ function EditFeedbackForm({ feedback, onSaved }: { feedback: Feedback; onSaved: 
             </div>
             <div className="space-y-2">
                 <Label htmlFor="status">Status</Label>
-                <Select onValueChange={(value: 'New' | 'In Progress' | 'Completed') => setStatus(value)} defaultValue={status}>
+                <Select onValueChange={(value: 'New' | 'In Progress' | 'Resolved' | 'Completed') => setStatus(value)} defaultValue={status}>
                     <SelectTrigger id="status">
                         <SelectValue placeholder="Select status" />
                     </SelectTrigger>
                     <SelectContent>
                         <SelectItem value="New">New</SelectItem>
                         <SelectItem value="In Progress">In Progress</SelectItem>
-                        <SelectItem value="Completed">Completed</SelectItem>
+                        <SelectItem value="Resolved">Mark as Resolved</SelectItem>
+                        <SelectItem value="Completed">Close as Completed</SelectItem>
                     </SelectContent>
                 </Select>
             </div>
@@ -292,6 +293,7 @@ export default function ManageFeedbackPage() {
     switch (status) {
         case 'New': return 'secondary';
         case 'In Progress': return 'default';
+        case 'Resolved': return 'destructive';
         case 'Completed': return 'outline';
         default: return 'secondary';
     }

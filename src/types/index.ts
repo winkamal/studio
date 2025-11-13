@@ -48,7 +48,7 @@ export type Feedback = {
   id: string;
   type: 'bug' | 'feature';
   description: string;
-  status: 'New' | 'In Progress' | 'Completed';
+  status: 'New' | 'In Progress' | 'Resolved' | 'Completed';
   comment: string;
   createdAt: string;
   screenshotUrl?: string;
