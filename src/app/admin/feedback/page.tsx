@@ -342,7 +342,7 @@ export default function ManageFeedbackPage() {
                     <TableHead>Type</TableHead>
                     <TableHead className="w-[50%]">Description</TableHead>
                     <TableHead>Status</TableHead>
-                    <TableHead>Created</TableHead>
+                    <TableHead>Created At</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -367,7 +367,7 @@ export default function ManageFeedbackPage() {
                           <Badge variant={getStatusBadgeVariant(item.status)}>{item.status}</Badge>
                         </TableCell>
                         <TableCell>
-                          {format(new Date(item.createdAt), 'yyyy-MM-dd')}
+                          {format(new Date(item.createdAt), 'yyyy-MM-dd HH:mm')}
                         </TableCell>
                         <TableCell className="text-right">
                            <Button variant="ghost" size="icon" onClick={() => handleEditClick(item)}>
